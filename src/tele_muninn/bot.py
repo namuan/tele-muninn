@@ -1,37 +1,32 @@
 import logging
 import os
 
-from telegram import Update  # type: ignore
-from telegram.ext import (  # type: ignore
-    CommandHandler,
-    Filters,
-    MessageHandler,
-    Updater,
-)
+from telegram import Update
+from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
 
 from tele_muninn.greetings import greet
 
 
-def welcome(update: Update, _) -> None:
+def welcome(update: Update, _):
     """Handle start command"""
     if update.message:
         update.message.reply_text("Hi!")
 
 
-def help_command(update: Update, _) -> None:
+def help_command(update: Update, _):
     """Handle help command"""
     if update.message:
         update.message.reply_text("Help!")
 
 
-def handle_cmd(update: Update, _) -> None:
+def handle_cmd(update: Update, _):
     """Handle all updates"""
     if update.message:
         logging.info(update.message.text)
         update.message.reply_text(greet())
 
 
-def start_bot() -> bool:
+def start_bot():
     """Start bot and hook callback functions"""
     print("🏗 Starting bot")
     bot_token = os.getenv("TELE_MUNINN_BOT_TOKEN")

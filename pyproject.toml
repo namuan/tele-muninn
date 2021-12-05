@@ -13,16 +13,16 @@ homepage = "https://namuan.github.io/tele-muninn"
 repository = "https://github.com/namuan/tele-muninn"
 
 classifiers = [
-  "Development Status :: 4 - Beta",
-  "Intended Audience :: Developers",
-  "Operating System :: OS Independent",
-  "Programming Language :: Python",
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.7",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
-  "Topic :: Software Development :: Libraries :: Python Modules",
-  "Typing :: Typed",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
 ]
 
 packages = [
@@ -31,6 +31,9 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.7.1, <4.0"
+requests = "*"
+python-dotenv = "*"
+python-telegram-bot = "*"
 
 [tool.poetry.dev-dependencies]
 autoflake = "*"
@@ -79,7 +82,7 @@ exclude_lines = [
     'pragma: no cover'
 ]
 omit = [
-    'src/tele_muninn/main.py',
+    'src/tele_muninn/console.py',
     'src/tele_muninn/bot.py',
 ]
 
@@ -96,8 +99,12 @@ show_error_codes = true
 
 [[tool.mypy.overrides]]
 module = [
-    "tele_muninn/main",
+    "tele_muninn/console",
     "tele_muninn/bot",
 ]
 disallow_any_unimported = false
 disallow_untyped_defs = false
+check_untyped_defs = false
+
+[tool.poetry.scripts]
+tele-muninn = 'tele_muninn.console:cli'

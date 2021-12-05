@@ -13,10 +13,10 @@ logging.basicConfig(
 logging.captureWarnings(capture=True)
 
 
-def main() -> None:
+def cli() -> None:
     print("Starting with bot wrapper")
     start_bot()
 
 
 if __name__ == "__main__":
-    main()
+    cli()
