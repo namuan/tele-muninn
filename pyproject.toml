@@ -80,6 +80,10 @@ exclude_lines = [
     'if TYPE_CHECKING:',
     'pragma: no cover'
 ]
+omit = [
+    'src/tele_muninn/main.py',
+    'src/tele_muninn/bot.py',
+]
 
 [tool.mypy]
 disallow_any_unimported = true
@@ -91,3 +95,11 @@ warn_redundant_casts = true
 warn_return_any = true
 check_untyped_defs = true
 show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = [
+    "tele_muninn/main",
+    "tele_muninn/bot",
+]
+disallow_any_unimported = false
+disallow_untyped_defs = false

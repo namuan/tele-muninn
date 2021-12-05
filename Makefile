@@ -16,6 +16,12 @@ pre-commit: ## Manually run all precommit hooks
 	pre-commit install
 	pre-commit run --all-files
 
+typecheck: ## Run mypy
+	poetry run mypy --show-error-codes --pretty .
+
+test: typecheck ## Run tests
+	poetry run pytest
+
 .PHONY: help
 .DEFAULT_GOAL := help
 
