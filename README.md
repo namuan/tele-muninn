@@ -24,6 +24,18 @@ Just like Alfred but for Telegram
 pip install tele-muninn
 ```
 
+## Usage
+
+Setup following environment variables:
+```
+export TELE_MUNINN_BOT_TOKEN=
+```
+
+Run following command:
+```
+tele-muninn
+```
+
 ## Development
 
 * Clone this repository
