@@ -1,0 +1,18 @@
+{
+  "template": "https://github.com/woltapp/wolt-python-package-cookiecutter",
+  "commit": "b508f7b51bc2d74d6c343cb15b94e6ec9c83355f",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "author_name": "Namuan",
+      "author_email": "github@deskriders.dev",
+      "github_username": "namuan",
+      "project_name": "tele-muninn",
+      "project_slug": "tele-muninn",
+      "package_name": "tele_muninn",
+      "project_short_description": "Just like Alfred but for Telegram",
+      "_template": "https://github.com/woltapp/wolt-python-package-cookiecutter"
+    }
+  },
+  "directory": null
+}
