@@ -8,9 +8,7 @@ authors = [
 license = "MIT"
 readme = "README.md"
 
-documentation = "https://namuan.github.io/tele-muninn"
-homepage = "https://namuan.github.io/tele-muninn"
-repository = "https://github.com/namuan/tele-muninn"
+homepage = "https://github.com/namuan/tele-muninn"
 
 classifiers = [
     "Development Status :: 4 - Beta",
