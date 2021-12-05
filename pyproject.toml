@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tele-muninn"
-version = "0.0.2"
+version = "0.0.3"
 description = "Just like Alfred but for Telegram"
 authors = [
     "Namuan <github@deskriders.dev>",
