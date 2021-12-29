@@ -22,6 +22,9 @@ typecheck: ## Run mypy
 test: typecheck ## Run tests
 	poetry run pytest
 
+run: ## Run the project
+	poetry run $$PROJECTNAME
+
 .PHONY: help
 .DEFAULT_GOAL := help
 
