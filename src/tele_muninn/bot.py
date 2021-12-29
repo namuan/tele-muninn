@@ -1,29 +1,25 @@
-import logging
 import os
 
 from telegram import Update
 from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
 
-from tele_muninn.greetings import greet
+from tele_muninn.message_processor import IncomingMessage, handle_cmd
 
 
 def welcome(update: Update, _):
-    """Handle start command"""
     if update.message:
         update.message.reply_text("Hi!")
 
 
 def help_command(update: Update, _):
-    """Handle help command"""
     if update.message:
         update.message.reply_text("Help!")
 
 
-def handle_cmd(update: Update, _):
-    """Handle all updates"""
-    if update.message:
-        logging.info(update.message.text)
-        update.message.reply_text(greet())
+def adapter(update: Update, _):
+    in_message = IncomingMessage(text=update.message.text)
+    response = handle_cmd(in_message)
+    update.message.reply_text(response)
 
 
 def start_bot():
@@ -41,7 +37,7 @@ def start_bot():
 
     dispatcher.add_handler(CommandHandler("start", welcome))
     dispatcher.add_handler(CommandHandler("help", help_command))
-    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_cmd))
+    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, adapter))
 
     updater.start_polling()
     updater.idle()

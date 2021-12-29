@@ -19,8 +19,8 @@ pre-commit: ## Manually run all precommit hooks
 typecheck: ## Run mypy
 	poetry run mypy --show-error-codes --pretty .
 
-test: typecheck ## Run tests
-	poetry run pytest
+tests: clean ## Run all tests
+	poetry run ward
 
 run: ## Run the project
 	poetry run $$PROJECTNAME
