@@ -3,7 +3,7 @@ name = "tele-muninn"
 version = "0.0.3"
 description = "Just like Alfred but for Telegram"
 authors = [
-    "Namuan <github@deskriders.dev>",
+    "namuan <github@deskriders.dev>",
 ]
 license = "MIT"
 readme = "README.md"
@@ -44,6 +44,8 @@ flake8-comprehensions = "*"
 flake8-debugger = "*"
 flake8-logging-format = "*"
 isort = "*"
+mkdocstrings = "*"
+mkdocs-material = "*"
 mypy = "*"
 pep8-naming = "*"
 pre-commit = "*"
@@ -53,7 +55,18 @@ pytest-cov = "*"
 python-kacl = "*"
 pyupgrade = "*"
 tryceratops = "*"
+commitizen = "^2.20.3"
 ward = "^0.65.0-beta.0"
+
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.0.3"
+tag_format = "$version"
+version_files = [
+    "pyproject.toml:version",
+]
+update_changelog_on_bump = true
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -64,26 +77,21 @@ profile = "black"
 src_paths = ["src", "tests"]
 
 [tool.black]
+line-length = 120
 target-version = ["py37", "py38", "py39"]
 include = '\.pyi?$'
 
 [tool.pytest.ini_options]
 addopts = """\
     --cov tele_muninn \
-    --cov tests \
     --cov-report term-missing \
     --no-cov-on-fail \
 """
 
 [tool.coverage.report]
-fail_under = 100
+fail_under = 90
 exclude_lines = [
-    'if TYPE_CHECKING:',
     'pragma: no cover'
-]
-omit = [
-    'src/tele_muninn/console.py',
-    'src/tele_muninn/bot.py',
 ]
 
 [tool.mypy]

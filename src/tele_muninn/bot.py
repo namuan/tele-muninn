@@ -1,3 +1,4 @@
+import logging
 import os
 
 from telegram import Update
@@ -24,10 +25,10 @@ def adapter(update: Update, _):
 
 def start_bot():
     """Start bot and hook callback functions"""
-    print("🏗 Starting bot")
+    logging.info("🏗 Starting bot")
     bot_token = os.getenv("TELE_MUNINN_BOT_TOKEN")
     if not bot_token:
-        print(
+        logging.info(
             "🚫 Bot token not found. Please make sure that you set the TELE_MUNINN_BOT_TOKEN environment variable."
         )
         return False

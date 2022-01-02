@@ -2,28 +2,43 @@ export PROJECTNAME=$(shell basename "$(PWD)")
 
 .SILENT: ;               # no need for @
 
+new-project: ## Instruction to setup a new project. Run ./init-new-project.sh NEW_PROJECT_NAME
+	echo "Run ./init-new-project.sh NEW_PROJECT_NAME"
+
 setup: ## Setup Virtual Env
 	poetry install
 
-deps: ## Install dependencies
-	poetry update
+deps: ## Install/Update dependencies
+	poetry lock
+	poetry run pre-commit autoupdate
 
 clean: ## Clean package
 	find . -type d -name '__pycache__' | xargs rm -rf
+	find . -type d -name '.temp' | xargs rm -rf
+	find . -type f -name '.coverage' | xargs rm -rf
 	rm -rf build dist
 
-pre-commit: ## Manually run all precommit hooks
-	pre-commit install
-	pre-commit run --all-files
+comby: ## Generic rules (required comby https://comby.dev/docs/)
+	comby 'print(:[1])' 'logging.info(:[1])' -directory 'src' -extensions 'py' -in-place
 
-typecheck: ## Run mypy
-	poetry run mypy --show-error-codes --pretty .
+pre-commit: comby ## Manually run all precommit hooks
+	poetry run pre-commit run --all-files
+
+pre-commit-tool: ## Manually run a single pre-commit hook
+	poetry run pre-commit run $(TOOL) --all-files
 
 tests: clean ## Run all tests
-	poetry run ward
+	poetry run coverage run -m ward
+	poetry run coverage xml -i
 
-run: ## Run the project
-	poetry run $$PROJECTNAME
+build: pre-commit tests ## Build package
+	poetry build
+
+bump: build ## Bump version and update changelog
+	poetry run cz bump --changelog
+
+bpython: ## Runs bpython
+	bpython
 
 .PHONY: help
 .DEFAULT_GOAL := help

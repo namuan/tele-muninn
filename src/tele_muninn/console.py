@@ -14,7 +14,7 @@ logging.captureWarnings(capture=True)
 
 
 def cli() -> None:
-    print("Starting with bot wrapper")
+    logging.info("Starting with bot wrapper")
     start_bot()
 
 

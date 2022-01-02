@@ -18,7 +18,7 @@ jobs:
         id: check_for_outdated_dependencies
         run: |
           body=$(poetry show -o -n)
-          echo ::set-output name=body::$body
+          echo ::set-output name="body::$body"
 
       - name: Format PR message
         if: ${{ steps.check_for_outdated_dependencies.outputs.body != 0 }}
@@ -35,11 +35,11 @@ jobs:
           body="${body//'%'/'%25'}"
           body="${body//$'\n'/'%0A'}"
           body="${body//$'\r'/'%0D'}"
-          echo ::set-output name=body::$body
+          echo ::set-output name="body::$body"
 
       - name: Update outdated packages
         if: ${{ steps.check_for_outdated_dependencies.outputs.body != 0 }}
-        run: poetry lock
+        run: make deps
 
       # behaviour if PR already exists: https://github.com/marketplace/actions/create-pull-request#action-behaviour
       - name: Create Pull Request
