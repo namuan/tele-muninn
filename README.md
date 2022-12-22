@@ -10,7 +10,7 @@
 ### Scripts
 
 <!-- START makefile-doc -->
-[_tele_web_links.py_](https://namuan.github.io/bin-utils/tele_web_links.html)
+[_tele_web_links.py_](https://namuan.github.io/tele-muninn/tele_web_links.html)
 ```
 usage: tele_web_links.py [-h] [-v]
 
@@ -21,7 +21,7 @@ options:
   -v, --verbose  Increase verbosity of logging output
 
 ```
-[_readme_docs.py_](https://namuan.github.io/bin-utils/readme_docs.html)
+[_readme_docs.py_](https://namuan.github.io/tele-muninn/readme_docs.html)
 ```
 usage: readme_docs.py [-h]
 
@@ -31,7 +31,7 @@ options:
   -h, --help  show this help message and exit
 
 ```
-[_hn_new_github_repos.py_](https://namuan.github.io/bin-utils/hn_new_github_repos.html)
+[_hn_new_github_repos.py_](https://namuan.github.io/tele-muninn/hn_new_github_repos.html)
 ```
 usage: hn_new_github_repos.py [-h] [-v]
 
@@ -46,15 +46,15 @@ options:
   -v, --verbose  Display context variables at each step
 
 ```
-[_twitter_furus.py_](https://namuan.github.io/bin-utils/twitter_furus.html)
+[_twitter_furus.py_](https://namuan.github.io/tele-muninn/twitter_furus.html)
 ```
 
 ```
-[_tele_stock_rider_bot.py_](https://namuan.github.io/bin-utils/tele_stock_rider_bot.html)
+[_tele_stock_rider_bot.py_](https://namuan.github.io/tele-muninn/tele_stock_rider_bot.html)
 ```
 
 ```
-[_rider_brain_bot.py_](https://namuan.github.io/bin-utils/rider_brain_bot.html)
+[_rider_brain_bot.py_](https://namuan.github.io/tele-muninn/rider_brain_bot.html)
 ```
 usage: rider_brain_bot.py [-h]
 
