@@ -171,7 +171,7 @@ plain_text_handler_mapping = {
 def find_plain_text_handler(incoming_text):
     for prefix, handler in plain_text_handler_mapping.items():
         if incoming_text.startswith(prefix):
-            return handler(incoming_text[len(prefix):].strip())
+            return handler(incoming_text[len(prefix) :].strip())
 
     return None
 

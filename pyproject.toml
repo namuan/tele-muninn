@@ -1,0 +1,31 @@
+[tool.isort]
+profile = "black"
+
+[tool.black]
+target-version = ["py37", "py38", "py39"]
+line-length = 120
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | fireprofile
+  | venv
+  | temp
+  | \.idea
+  | generated
+)/
+'''
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.1.0"
+tag_format = "$version"
+update_changelog_on_bump = true
