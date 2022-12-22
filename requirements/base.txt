@@ -14,3 +14,4 @@ pytube
 vaderSentiment
 openai
 py-executable-checklist==1.2.0
+peewee

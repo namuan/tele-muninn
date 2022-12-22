@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>twitter_furus.py</title>
+  <link rel="stylesheet" href="pycco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div class='section'>
+    <div class='docs'><h1>twitter_furus.py</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">peewee</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BigIntegerField</span><span class="p">,</span>
+    <span class="n">CharField</span><span class="p">,</span>
+    <span class="n">DateTimeField</span><span class="p">,</span>
+    <span class="n">Model</span><span class="p">,</span>
+    <span class="n">SqliteDatabase</span><span class="p">,</span>
+    <span class="n">UUIDField</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">common_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">build_chart_links_for</span><span class="p">,</span>
+    <span class="n">search_rgx</span><span class="p">,</span>
+    <span class="n">send_message_to_telegram</span><span class="p">,</span>
+    <span class="n">uuid_gen</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">twitter_api</span> <span class="kn">import</span> <span class="n">get_twitter_user_timeline</span>
+
+<span class="n">home_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">)</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">SqliteDatabase</span><span class="p">(</span><span class="n">home_dir</span> <span class="o">+</span> <span class="s2">&quot;/twitter_pumps.db&quot;</span><span class="p">)</span>
+
+<span class="n">BOT_TOKEN</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;BOT_TOKEN&quot;</span><span class="p">)</span>
+<span class="n">GROUP_CHAT_ID</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;GROUP_CHAT_ID&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">TweetData</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">UUIDField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">twitter_handle</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">symbol</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">timestamp</span> <span class="o">=</span> <span class="n">BigIntegerField</span><span class="p">()</span>
+    <span class="n">tweet_id</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">tweet</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">()</span>
+    <span class="n">posted_at</span> <span class="o">=</span> <span class="n">DateTimeField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">database</span> <span class="o">=</span> <span class="n">db</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">save_from</span><span class="p">(</span><span class="n">twitter_handle</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">tweet</span><span class="p">,</span> <span class="n">tweet_id</span><span class="p">,</span> <span class="n">posted_at</span><span class="p">):</span>
+        <span class="n">entity</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="nb">id</span><span class="o">=</span><span class="n">uuid_gen</span><span class="p">(),</span>
+            <span class="n">timestamp</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+            <span class="n">twitter_handle</span><span class="o">=</span><span class="n">twitter_handle</span><span class="p">,</span>
+            <span class="n">tweet_id</span><span class="o">=</span><span class="n">tweet_id</span><span class="p">,</span>
+            <span class="n">symbol</span><span class="o">=</span><span class="n">symbol</span><span class="p">,</span>
+            <span class="n">tweet</span><span class="o">=</span><span class="n">tweet</span><span class="p">,</span>
+            <span class="n">posted_at</span><span class="o">=</span><span class="n">posted_at</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">TweetData</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">entity</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+
+
+<span class="n">TweetData</span><span class="o">.</span><span class="n">create_table</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">save_data</span><span class="p">(</span><span class="n">tweet_data</span><span class="p">):</span>
+    <span class="n">TweetData</span><span class="o">.</span><span class="n">save_from</span><span class="p">(</span><span class="o">**</span><span class="n">tweet_data</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">tweet_already_processed</span><span class="p">(</span><span class="n">current_tweet_id</span><span class="p">):</span>
+    <span class="n">selected_tweet</span> <span class="o">=</span> <span class="n">TweetData</span><span class="o">.</span><span class="n">get_or_none</span><span class="p">(</span><span class="n">TweetData</span><span class="o">.</span><span class="n">tweet_id</span> <span class="o">==</span> <span class="n">current_tweet_id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">selected_tweet</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">fetch_recent_tweets</span><span class="p">(</span><span class="n">acct</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fetching last tweet from account </span><span class="si">{</span><span class="n">acct</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">get_twitter_user_timeline</span><span class="p">(</span><span class="n">acct</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">extract_tweet_id</span><span class="p">(</span><span class="n">new_tweet</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">new_tweet</span><span class="o">.</span><span class="n">id</span>
+
+
+<span class="k">def</span> <span class="nf">extract_tweet_time</span><span class="p">(</span><span class="n">recent_tweet</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">recent_tweet</span><span class="o">.</span><span class="n">created_at</span>
+
+
+<span class="k">def</span> <span class="nf">extract_symbols</span><span class="p">(</span><span class="n">new_tweet</span><span class="p">):</span>
+    <span class="n">tweet</span> <span class="o">=</span> <span class="n">new_tweet</span><span class="o">.</span><span class="n">text</span>
+    <span class="n">symbols</span> <span class="o">=</span> <span class="n">search_rgx</span><span class="p">(</span><span class="n">tweet</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\$([a-zA-Z]+)&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extracted </span><span class="si">{</span><span class="n">symbols</span><span class="si">}</span><span class="s2"> stock symbol from </span><span class="si">{</span><span class="n">tweet</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tweet</span><span class="p">,</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">symbols</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">flatten_list</span><span class="p">(</span><span class="n">given_list</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">given_list</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">collect_symbols_from_tweets</span><span class="p">(</span><span class="n">twitter_accounts</span><span class="p">):</span>
+    <span class="n">symbols</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">acct</span> <span class="ow">in</span> <span class="n">twitter_accounts</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">acct</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
+            <span class="k">continue</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">recent_tweets</span> <span class="o">=</span> <span class="n">fetch_recent_tweets</span><span class="p">(</span><span class="n">acct</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">recent_tweet</span> <span class="ow">in</span> <span class="n">recent_tweets</span><span class="p">:</span>
+                <span class="n">tweet_id</span> <span class="o">=</span> <span class="n">extract_tweet_id</span><span class="p">(</span><span class="n">recent_tweet</span><span class="p">)</span>
+                <span class="n">raw_posted_dt</span> <span class="o">=</span> <span class="n">extract_tweet_time</span><span class="p">(</span><span class="n">recent_tweet</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">tweet_already_processed</span><span class="p">(</span><span class="n">tweet_id</span><span class="p">):</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Old Tweet from </span><span class="si">{</span><span class="n">acct</span><span class="si">}</span><span class="s2"> at </span><span class="si">{</span><span class="n">raw_posted_dt</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">tweet_id</span><span class="si">}</span><span class="s2"> - already processed&quot;</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;New Tweet from </span><span class="si">{</span><span class="n">acct</span><span class="si">}</span><span class="s2"> at </span><span class="si">{</span><span class="n">raw_posted_dt</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">tweet_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="n">tweet</span><span class="p">,</span> <span class="n">symbols_from_message</span> <span class="o">=</span> <span class="n">extract_symbols</span><span class="p">(</span><span class="n">recent_tweet</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">tweet</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;RT&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">symbols_from_message</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">flatten_list</span><span class="p">(</span><span class="n">symbols_from_message</span><span class="p">):</span>
+                        <span class="n">entity</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                            <span class="n">twitter_handle</span><span class="o">=</span><span class="n">acct</span><span class="p">,</span>
+                            <span class="n">symbol</span><span class="o">=</span><span class="n">symbol</span><span class="p">,</span>
+                            <span class="n">tweet</span><span class="o">=</span><span class="n">tweet</span><span class="p">,</span>
+                            <span class="n">tweet_id</span><span class="o">=</span><span class="n">tweet_id</span><span class="p">,</span>
+                            <span class="n">posted_at</span><span class="o">=</span><span class="n">raw_posted_dt</span><span class="p">,</span>
+                        <span class="p">)</span>
+                        <span class="n">symbols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entity</span><span class="p">)</span>
+                        <span class="n">save_data</span><span class="p">(</span><span class="n">entity</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error collecting symbols from twitter account </span><span class="si">{</span><span class="n">acct</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">poll_freq_in_secs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">symbols</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">twitter_accounts</span><span class="p">,</span> <span class="n">poll_freq_in_secs</span><span class="p">):</span>
+    <span class="n">symbols</span> <span class="o">=</span> <span class="n">collect_symbols_from_tweets</span><span class="p">(</span><span class="n">twitter_accounts</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;==&gt; Collected symbols: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;symbol&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">symbols</span><span class="p">]))</span>
+    <span class="n">symbols_already_processed</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">symbol_mention</span> <span class="ow">in</span> <span class="n">symbols</span><span class="p">:</span>
+        <span class="n">symbol</span> <span class="o">=</span> <span class="n">symbol_mention</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;symbol&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">symbols_already_processed</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">symbols_already_processed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+
+        <span class="n">mention_acct</span> <span class="o">=</span> <span class="n">symbol_mention</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;twitter_handle&quot;</span><span class="p">)</span>
+        <span class="n">mention_tweet_id</span> <span class="o">=</span> <span class="n">symbol_mention</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tweet_id&quot;</span><span class="p">)</span>
+        <span class="n">tweet_posted_date</span> <span class="o">=</span> <span class="n">symbol_mention</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;posted_at&quot;</span><span class="p">)</span>
+        <span class="n">formatted_posted_dt</span> <span class="o">=</span> <span class="n">tweet_posted_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%H:%M(</span><span class="si">%d</span><span class="s2"> %B)&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">daily_chart</span><span class="p">,</span> <span class="n">weekly_chart</span><span class="p">,</span> <span class="n">message</span> <span class="o">=</span> <span class="n">build_chart_links_for</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;🚀 #*</span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">* 👀 posted by [</span><span class="si">{</span><span class="n">mention_acct</span><span class="si">}</span><span class="s2">](https://twitter.com/</span><span class="si">{</span><span class="n">mention_acct</span><span class="si">}</span><span class="s2">/status/</span><span class="si">{</span><span class="n">mention_tweet_id</span><span class="si">}</span><span class="s2">) at </span><span class="si">{</span><span class="n">formatted_posted_dt</span><span class="si">}</span><span class="s2">&quot;&quot;&quot;</span>
+            <span class="n">send_message_to_telegram</span><span class="p">(</span><span class="n">BOT_TOKEN</span><span class="p">,</span> <span class="n">GROUP_CHAT_ID</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">disable_web_preview</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">send_message_to_telegram</span><span class="p">(</span>
+                <span class="n">BOT_TOKEN</span><span class="p">,</span>
+                <span class="n">GROUP_CHAT_ID</span><span class="p">,</span>
+                <span class="n">daily_chart</span><span class="p">,</span>
+                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;HTML&quot;</span><span class="p">,</span>
+                <span class="n">disable_web_preview</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">send_message_to_telegram</span><span class="p">(</span>
+                <span class="n">BOT_TOKEN</span><span class="p">,</span>
+                <span class="n">GROUP_CHAT_ID</span><span class="p">,</span>
+                <span class="n">weekly_chart</span><span class="p">,</span>
+                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;HTML&quot;</span><span class="p">,</span>
+                <span class="n">disable_web_preview</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">send_message_to_telegram</span><span class="p">(</span><span class="n">BOT_TOKEN</span><span class="p">,</span> <span class="n">GROUP_CHAT_ID</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sent message by </span><span class="si">{</span><span class="n">mention_acct</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Something went wrong&quot;</span><span class="p">)</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">poll_freq_in_secs</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">twitter_accounts</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;twitter_furus_accounts.txt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+    <span class="n">poll_freq_in_secs</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">main</span><span class="p">(</span><span class="n">twitter_accounts</span><span class="p">,</span> <span class="n">poll_freq_in_secs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🚨🚨🚨 Something went wrong&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>

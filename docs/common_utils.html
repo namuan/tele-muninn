@@ -29,6 +29,7 @@
 <span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
@@ -304,6 +305,83 @@
 <span class="k">def</span> <span class="nf">run_command</span><span class="p">(</span><span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;⚡ </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">command</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>  <span class="c1"># nosemgrep</span>
+
+
+<span class="k">def</span> <span class="nf">uuid_gen</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">search_rgx</span><span class="p">(</span><span class="n">search_string</span><span class="p">,</span> <span class="n">rgx</span><span class="p">):</span>
+    <span class="n">regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">rgx</span><span class="p">)</span>
+    <span class="n">matches</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">search_string</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">matches</span>
+
+
+<span class="k">def</span> <span class="nf">build_chart_link</span><span class="p">(</span><span class="n">ticker</span><span class="p">,</span> <span class="n">time_period</span><span class="o">=</span><span class="s2">&quot;d&quot;</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-16'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-16'>#</a>
+      </div>
+      <p>Reference
+https://github.com/reaganmcf/discord-stock-bot/blob/master/index.js
+chart_link = &ldquo;https://elite.finviz.com/chart.ashx?t=aapl&amp;p=d&amp;ta=sma_20,sma_50,sma_200,macd_b_12_26_9,mfi_b_14&rdquo;</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">r_value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time_ns</span><span class="p">()</span> <span class="o">/</span> <span class="mi">1000000</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;https://stockcharts.com/c-sc/sc?s=</span><span class="si">{</span><span class="n">ticker</span><span class="si">}</span><span class="s2">&amp;p=</span><span class="si">{</span><span class="n">time_period</span><span class="si">}</span><span class="s2">&amp;b=5&amp;g=0&amp;i=t8072647300c&amp;r=</span><span class="si">{</span><span class="n">r_value</span><span class="si">}</span><span class="s2">&quot;</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-17'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-17'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">build_stock_links_in_markdown</span><span class="p">(</span><span class="n">ticker</span><span class="p">):</span>
+    <span class="n">sites</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;FinViz&quot;</span><span class="p">:</span> <span class="s2">&quot;https://www.finviz.com/quote.ashx?t=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;MarketChameleon&quot;</span><span class="p">:</span> <span class="s2">&quot;https://marketchameleon.com/Overview/</span><span class="si">{}</span><span class="s2">/&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;BarChart (Price)&quot;</span><span class="p">:</span> <span class="s2">&quot;https://www.barchart.com/stocks/quotes/</span><span class="si">{}</span><span class="s2">/overview&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;BarChart (Options)&quot;</span><span class="p">:</span> <span class="s2">&quot;https://www.barchart.com/stocks/quotes/</span><span class="si">{}</span><span class="s2">/options&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;StockInvest&quot;</span><span class="p">:</span> <span class="s2">&quot;https://stockinvest.us/technical-analysis/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TradingView&quot;</span><span class="p">:</span> <span class="s2">&quot;https://www.tradingview.com/chart/?symbol=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;SwingTradeBot&quot;</span><span class="p">:</span> <span class="s2">&quot;https://swingtradebot.com/equities/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;StockTwits (Sentiments)&quot;</span><span class="p">:</span> <span class="s2">&quot;https://stocktwits.com/symbol/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Y Finance&quot;</span><span class="p">:</span> <span class="s2">&quot;https://finance.yahoo.com/quote/</span><span class="si">{}</span><span class="s2">/holders?p=ZZZ&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;OAI Earnings&quot;</span><span class="p">:</span> <span class="s2">&quot;https://tools.optionsai.com/earnings/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;OptionStrat (Long Call)&quot;</span><span class="p">:</span> <span class="s2">&quot;https://optionstrat.com/build/long-call/</span><span class="si">{}</span><span class="s2">?referrer=stockriderbot&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">all_links</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">site_title</span><span class="si">}</span><span class="s2">](</span><span class="si">{</span><span class="n">site_link</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ticker</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="n">site_title</span><span class="p">,</span> <span class="n">site_link</span> <span class="ow">in</span> <span class="n">sites</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+    <span class="k">return</span> <span class="s2">&quot; | &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">all_links</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-18'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-18'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">build_chart_links_for</span><span class="p">(</span><span class="n">ticker</span><span class="p">):</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processing ticker: </span><span class="si">{</span><span class="n">ticker</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">daily_chart_link</span> <span class="o">=</span> <span class="n">build_chart_link</span><span class="p">(</span><span class="n">ticker</span><span class="p">,</span> <span class="n">time_period</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">)</span>
+    <span class="n">weekly_chart_link</span> <span class="o">=</span> <span class="n">build_chart_link</span><span class="p">(</span><span class="n">ticker</span><span class="p">,</span> <span class="n">time_period</span><span class="o">=</span><span class="s2">&quot;W&quot;</span><span class="p">)</span>
+    <span class="n">sites_urls</span> <span class="o">=</span> <span class="n">build_stock_links_in_markdown</span><span class="p">(</span><span class="n">ticker</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">daily_chart_link</span><span class="p">,</span>
+        <span class="n">weekly_chart_link</span><span class="p">,</span>
+        <span class="n">sites_urls</span><span class="p">,</span>
+    <span class="p">)</span>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>

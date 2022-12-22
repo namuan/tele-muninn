@@ -130,3 +130,7 @@ dmypy.json
 
 # IDE
 .idea/
+
+# Other custom files
+webpages.txt
+twitter_furus_accounts.txt

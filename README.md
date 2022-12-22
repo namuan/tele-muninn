@@ -35,6 +35,10 @@ options:
   -v, --verbose  Display context variables at each step
 
 ```
+[_twitter_furus.py_](https://namuan.github.io/bin-utils/twitter_furus.html)
+```
+
+```
 [_rider_brain_bot.py_](https://namuan.github.io/bin-utils/rider_brain_bot.html)
 ```
 usage: rider_brain_bot.py [-h]

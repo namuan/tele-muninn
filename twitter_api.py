@@ -18,6 +18,10 @@ auth.set_access_token(TWITTER_ACCESS_TOKEN_KEY, TWITTER_ACCESS_TOKEN_SECRET)
 api = tweepy.API(auth)
 
 
+def get_twitter_user_timeline(user_acct):
+    return api.user_timeline(user_acct, count=50)
+
+
 def get_tweet(tweet_id):
     return with_limit_handled(lambda: api.get_status(id=tweet_id))
 

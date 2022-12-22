@@ -7,6 +7,7 @@ import shutil
 import string
 import subprocess
 import time
+import uuid
 from functools import wraps
 from pathlib import Path
 
@@ -143,6 +144,55 @@ def http_get_request(url: str, headers: dict = None, timeout: int = 10) -> dict:
 def run_command(command: str) -> str:
     logging.info("⚡ %s", command)
     return subprocess.check_output(command, shell=True).decode("utf-8")  # nosemgrep
+
+
+def uuid_gen():
+    return uuid.uuid4()
+
+
+def search_rgx(search_string, rgx):
+    regex = re.compile(rgx)
+    matches = regex.findall(search_string)
+    return matches
+
+
+def build_chart_link(ticker, time_period="d"):
+    # Reference
+    # https://github.com/reaganmcf/discord-stock-bot/blob/master/index.js
+    # chart_link = "https://elite.finviz.com/chart.ashx?t=aapl&p=d&ta=sma_20,sma_50,sma_200,macd_b_12_26_9,mfi_b_14"
+    r_value = int(time.time_ns() / 1000000)
+    return f"https://stockcharts.com/c-sc/sc?s={ticker}&p={time_period}&b=5&g=0&i=t8072647300c&r={r_value}"
+
+
+def build_stock_links_in_markdown(ticker):
+    sites = {
+        "FinViz": "https://www.finviz.com/quote.ashx?t={}",
+        "MarketChameleon": "https://marketchameleon.com/Overview/{}/",
+        "BarChart (Price)": "https://www.barchart.com/stocks/quotes/{}/overview",
+        "BarChart (Options)": "https://www.barchart.com/stocks/quotes/{}/options",
+        "StockInvest": "https://stockinvest.us/technical-analysis/{}",
+        "TradingView": "https://www.tradingview.com/chart/?symbol={}",
+        "SwingTradeBot": "https://swingtradebot.com/equities/{}",
+        "StockTwits (Sentiments)": "https://stocktwits.com/symbol/{}",
+        "Y Finance": "https://finance.yahoo.com/quote/{}/holders?p=ZZZ",
+        "OAI Earnings": "https://tools.optionsai.com/earnings/{}",
+        "OptionStrat (Long Call)": "https://optionstrat.com/build/long-call/{}?referrer=stockriderbot",
+    }
+
+    all_links = [f"[{site_title}]({site_link.format(ticker)})" for site_title, site_link in sites.items()]
+    return " | ".join(all_links)
+
+
+def build_chart_links_for(ticker):
+    logging.info(f"Processing ticker: {ticker}")
+    daily_chart_link = build_chart_link(ticker, time_period="D")
+    weekly_chart_link = build_chart_link(ticker, time_period="W")
+    sites_urls = build_stock_links_in_markdown(ticker)
+    return (
+        daily_chart_link,
+        weekly_chart_link,
+        sites_urls,
+    )
 
 
 if __name__ == "__main__":
