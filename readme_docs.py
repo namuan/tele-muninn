@@ -47,7 +47,9 @@ def main(args):
         if f.name in ignored_files:
             continue
         logging.info(f"Running python --help on {f}")
-        py_help_output = subprocess.run([f"./{f.as_posix()} --help"], shell=True, capture_output=True)  # nosemgrep
+        py_help_output = subprocess.run(
+            [f"python3 {f.as_posix()} --help"], shell=True, capture_output=True
+        )  # nosemgrep
         py_scripts_with_help.append(
             "[_{}_](https://namuan.github.io/tele-muninn/{}.html){}```{}{}{}```".format(
                 f.name, f.stem, os.linesep, os.linesep, py_help_output.stdout.decode("utf-8"), os.linesep

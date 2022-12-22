@@ -48,10 +48,26 @@ options:
 ```
 [_twitter_furus.py_](https://namuan.github.io/tele-muninn/twitter_furus.html)
 ```
+usage: twitter_furus.py [-h] [-v]
+
+Fetch tweets from a list of twitter accounts and send the tweets to a telegram group
+It also generates a chart for the stock symbol mentioned in the tweet
+
+options:
+  -h, --help     show this help message and exit
+  -v, --verbose  Increase verbosity of logging output
 
 ```
 [_tele_stock_rider_bot.py_](https://namuan.github.io/tele-muninn/tele_stock_rider_bot.html)
 ```
+usage: tele_stock_rider_bot.py [-h] [-v]
+
+Listen to messages with a stock ticker starting with a $ sign and reply with a chart.
+It also sends a messages with links to various websites with more information about the stock.
+
+options:
+  -h, --help     show this help message and exit
+  -v, --verbose  Increase verbosity of logging output
 
 ```
 [_rider_brain_bot.py_](https://namuan.github.io/tele-muninn/rider_brain_bot.html)
