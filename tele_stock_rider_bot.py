@@ -7,6 +7,7 @@ import logging
 import os
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
+import telegram
 from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import (
@@ -17,7 +18,7 @@ from telegram.ext import (
     Updater,
 )
 
-from common_utils import build_chart_links_for, setup_logging
+from common_utils import build_chart_links_for, retry, setup_logging, verified_chat_id
 
 load_dotenv()
 
@@ -46,8 +47,13 @@ def generate_report(ticker, update: Update, context: CallbackContext):
         bot.send_message(cid, str(e))
 
 
+@retry(telegram.error.TimedOut, tries=3)
 def handle_cmd(update: Update, context: CallbackContext) -> None:
     print(f"Incoming update: {update}")
+    chat_id = update.effective_chat.id
+    if not verified_chat_id(chat_id):
+        return
+
     maybe_symbol: str = update.message.text
     if maybe_symbol.startswith("$"):
         ticker = maybe_symbol[1:]
@@ -77,7 +83,7 @@ def parse_args():
         "-v",
         "--verbose",
         action="count",
-        default=0,
+        default=1,
         dest="verbose",
         help="Increase verbosity of logging output",
     )

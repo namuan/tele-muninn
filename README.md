@@ -1,5 +1,10 @@
 # tele-muninn
-🦅
+
+Collection of Telegram bots
+
+![](muninn-logo.jpg)
+
+> Acrylic Paint of Muninn, Aerial View, in the style of Ancient Egyptian Art
 
 ###### Setting up python3 and dependencies with VirtualEnv
 
@@ -10,6 +15,17 @@
 ### Scripts
 
 <!-- START makefile-doc -->
+[_tele_bookmark_bot.py_](https://namuan.github.io/tele-muninn/tele_bookmark_bot.html)
+```
+usage: tele_bookmark_bot.py [-h] [-v]
+
+Bookmark notes, web pages, tweets, youtube videos, and photos.
+
+options:
+  -h, --help     show this help message and exit
+  -v, --verbose  Increase verbosity of logging output
+
+```
 [_tele_web_links.py_](https://namuan.github.io/tele-muninn/tele_web_links.html)
 ```
 usage: tele_web_links.py [-h] [-v]
@@ -31,19 +47,27 @@ options:
   -h, --help  show this help message and exit
 
 ```
-[_hn_new_github_repos.py_](https://namuan.github.io/tele-muninn/hn_new_github_repos.html)
+[_webpage_to_pdf.py_](https://namuan.github.io/tele-muninn/webpage_to_pdf.html)
 ```
-usage: hn_new_github_repos.py [-h] [-v]
+usage: webpage_to_pdf.py [-h] -i INPUT_URL -o OUTPUT_FILE_PATH
+                         [-w WAIT_IN_SECS_BEFORE_CAPTURE] [-s] [-v]
 
-Find Links to Github/GitLab and Bitbucket from HN new news
-Send links over Telegram
-
-Usage:
-./hn_new_github_repos.py -h
+Generate PDF from a webpage
 
 options:
-  -h, --help     show this help message and exit
-  -v, --verbose  Display context variables at each step
+  -h, --help            show this help message and exit
+  -i INPUT_URL, --input-url INPUT_URL
+                        Web Url
+  -o OUTPUT_FILE_PATH, --output-file-path OUTPUT_FILE_PATH
+                        Full output file path for PDF
+  -w WAIT_IN_SECS_BEFORE_CAPTURE, --wait-in-secs-before-capture WAIT_IN_SECS_BEFORE_CAPTURE
+                        Wait (in secs) before capturing screenshot
+  -s, --headless        Run headless (no browser window)
+  -v, --verbose         Increase verbosity of logging output
+
+```
+[_hn_new_github_repos.py_](https://namuan.github.io/tele-muninn/hn_new_github_repos.html)
+```
 
 ```
 [_twitter_furus.py_](https://namuan.github.io/tele-muninn/twitter_furus.html)
@@ -70,14 +94,17 @@ options:
   -v, --verbose  Increase verbosity of logging output
 
 ```
-[_rider_brain_bot.py_](https://namuan.github.io/tele-muninn/rider_brain_bot.html)
+[_tele_openai_bot.py_](https://namuan.github.io/tele-muninn/tele_openai_bot.html)
 ```
-usage: rider_brain_bot.py [-h]
+usage: tele_openai_bot.py [-h] [-v]
 
-🧠 Telegram bot to bookmark stuff
+Listen to messages with tt and ii prefix
+If a message begins with tt then it'll send a prompt to OpenAI Completion API
+If a message begins with ii then it'll send a prompt to OpenAI Image API
 
 options:
-  -h, --help  show this help message and exit
+  -h, --help     show this help message and exit
+  -v, --verbose  Increase verbosity of logging output
 
 ```
 <!-- END makefile-doc -->

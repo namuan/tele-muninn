@@ -1,6 +1,7 @@
 import base64
 import json
 import logging
+import os
 import random
 import re
 import shutil
@@ -193,6 +194,14 @@ def build_chart_links_for(ticker):
         weekly_chart_link,
         sites_urls,
     )
+
+
+def verified_chat_id(chat_id):
+    auth_chat_id = os.getenv("AUTH_CHAT_ID")
+    if chat_id != int(auth_chat_id):
+        logging.warning(f"🚫 Chat ID {chat_id} is not authorized. Authorized Chat Id: {auth_chat_id}")
+        return False
+    return True
 
 
 if __name__ == "__main__":

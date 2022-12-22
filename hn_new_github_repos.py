@@ -22,7 +22,12 @@ from dataset import Table
 from dotenv import load_dotenv
 from py_executable_checklist.workflow import WorkflowBase, run_workflow
 
-from common_utils import fetch_html_page, html_parser_from, send_message_to_telegram
+from common_utils import (
+    fetch_html_page,
+    html_parser_from,
+    send_message_to_telegram,
+    setup_logging,
+)
 
 # Common functions across steps
 load_dotenv()
@@ -166,16 +171,6 @@ def workflow():
 
 
 # Boilerplate
-
-
-def setup_logging():
-    logging.basicConfig(
-        handlers=[logging.StreamHandler()],
-        format="%(asctime)s - %(filename)s:%(lineno)d - %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-        level=logging.INFO,
-    )
-    logging.captureWarnings(capture=True)
 
 
 def parse_args():

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🧠 Telegram bot to bookmark stuff
+Bookmark notes, web pages, tweets, youtube videos, and photos.
 """
 import argparse
 import logging
@@ -10,14 +10,20 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 import dataset
-import openai
 import telegram
 from dotenv import load_dotenv
 from slug import slug
 from telegram import Update
 from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
 
-from common_utils import fetch_html_page, html_parser_from, retry, run_command
+from common_utils import (
+    fetch_html_page,
+    html_parser_from,
+    retry,
+    run_command,
+    setup_logging,
+    verified_chat_id,
+)
 from twitter_api import get_tweet
 from yt_api import video_title
 
@@ -31,9 +37,7 @@ logging.basicConfig(
 )
 logging.captureWarnings(capture=True)
 
-DEFAULT_BOT_TOKEN = os.getenv("BOT_TOKEN")
-GROUP_CHAT_ID = os.getenv("GROUP_CHAT_ID")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+RIDER_BRAIN_BOT_TOKEN = os.getenv("RIDER_BRAIN_BOT_TOKEN")
 
 HOME_DIR = os.getenv("HOME")
 DB_FILE = "rider_brain.db"
@@ -71,14 +75,6 @@ def update_user(bot, chat_id, original_message_id, reply_message_id, incoming_te
     bot.delete_message(chat_id, original_message_id)
     bot.delete_message(chat_id, reply_message_id)
     bot.send_message(chat_id, f"🔖 {incoming_text} bookmarked")
-
-
-def verified_chat_id(chat_id):
-    auth_chat_id = os.getenv("AUTH_CHAT_ID")
-    if chat_id != int(auth_chat_id):
-        logging.warning(f"🚫 Chat ID {chat_id} is not authorized. Authorized Chat Id: {auth_chat_id}")
-        return False
-    return True
 
 
 class BaseHandler:
@@ -145,44 +141,9 @@ class Photo(BaseHandler):
         return target_file.as_posix()
 
 
-class OpenAiCompletion(BaseHandler):
-    openai_completion_api_path: str = "https://api.openai.com/v1/engines/davinci/completions"
-
-    def bookmark(self):
-        completion = openai.Completion.create(engine="ada", prompt="Hello world")
-        if completion.choices:
-            return completion.choices[0].text
-        return "No completion found"
-
-
-class OpenAiDalle(BaseHandler):
-    openai_dalle_api_path: str = "https://api.openai.com/v1/engines/davinci-codex/completions"
-
-    def bookmark(self):
-        return self.note
-
-
-plain_text_handler_mapping = {
-    "tt": OpenAiCompletion,
-    "ii": OpenAiDalle,
-}
-
-
-def find_plain_text_handler(incoming_text):
-    for prefix, handler in plain_text_handler_mapping.items():
-        if incoming_text.startswith(prefix):
-            return handler(incoming_text[len(prefix) :].strip())
-
-    return None
-
-
 def message_handler_for(incoming_text) -> BaseHandler:
     if not incoming_text.startswith("http"):
-        plain_text_handler = find_plain_text_handler(incoming_text)
-        if not plain_text_handler:
-            return PlainTextNote(incoming_text)
-
-        return plain_text_handler
+        return PlainTextNote(incoming_text)
 
     incoming_url = incoming_text
 
@@ -219,14 +180,15 @@ def process_message(update: Update) -> None:
 def adapter(update: Update, context):
     try:
         chat_id = update.effective_chat.id
-        if not verified_chat_id(chat_id):
-            return
-
         bot = context.bot
         original_message_id = update.message.message_id
         update_message_text = update.message.text
 
         logging.info(f"📡 Processing message: {update_message_text} from {chat_id}")
+
+        if not verified_chat_id(chat_id):
+            return
+
         reply_message = bot.send_message(
             chat_id,
             f"Got {update_message_text}. 👀 at 🌎",
@@ -274,10 +236,19 @@ def setup_directories():
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="count",
+        default=1,
+        dest="verbose",
+        help="Increase verbosity of logging output",
+    )
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = parse_args()
     setup_directories()
+    setup_logging(args.verbose)
     start_bot()

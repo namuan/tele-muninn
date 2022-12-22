@@ -33,13 +33,15 @@ deploy: clean ## Copies any changed file to the server
 		common_utils.py \
 		twitter_api.py \
 		yt_api.py \
-		rider_brain_bot.py \
+		webpage_to_pdf.py \
+		tele_bookmark_bot.py \
 		hn_new_github_repos.py \
 		twitter_furus_accounts.txt \
 		twitter_furus.py \
 		tele_stock_rider_bot.py \
 		webpages.txt \
 		tele_web_links.py \
+		tele_openai_bot.py \
 		${PROJECTNAME}:./${PROJECTNAME}
 
 start: deploy ## Sets up a screen session on the server and start the app
