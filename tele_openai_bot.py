@@ -32,7 +32,7 @@ openai.api_key = OPENAI_API_KEY
 
 
 def start(update: Update, _) -> None:
-    update.message.reply_text("👋 Enter a stock ticker with a $ sign. Eg: $TSLA")
+    update.message.reply_text("👋 Enter a prompt after tt (for Text) or ii (for Image)")
 
 
 def help_command(update: Update, _) -> None:
