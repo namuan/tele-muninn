@@ -1,6 +1,12 @@
+#!/usr/bin/env python3
+"""
+Fetch tweets from a list of twitter accounts and send the tweets to a telegram group
+It also generates a chart for the stock symbol mentioned in the tweet
+"""
 import logging
 import os
 import time
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from pathlib import Path
 
 from peewee import (
@@ -159,7 +165,21 @@ def main(twitter_accounts, poll_freq_in_secs):
         time.sleep(poll_freq_in_secs)
 
 
+def parse_args():
+    parser = ArgumentParser(description=__doc__, formatter_class=RawDescriptionHelpFormatter)
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="count",
+        default=0,
+        dest="verbose",
+        help="Increase verbosity of logging output",
+    )
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
+    args = parse_args()
     twitter_accounts = Path("twitter_furus_accounts.txt").read_text().splitlines()
     poll_freq_in_secs = 5
     while True:

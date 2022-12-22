@@ -1,5 +1,11 @@
+#!/usr/bin/env python3
+"""
+Listen to messages with a stock ticker starting with a $ sign and reply with a chart.
+It also sends a messages with links to various websites with more information about the stock.
+"""
 import logging
 import os
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
 from dotenv import load_dotenv
 from telegram import Update
@@ -65,6 +71,20 @@ def main():
     updater.idle()
 
 
+def parse_args():
+    parser = ArgumentParser(description=__doc__, formatter_class=RawDescriptionHelpFormatter)
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="count",
+        default=0,
+        dest="verbose",
+        help="Increase verbosity of logging output",
+    )
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
-    setup_logging(2)
+    args = parse_args()
+    setup_logging(args.verbose)
     main()
