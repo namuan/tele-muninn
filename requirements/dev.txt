@@ -1,0 +1,10 @@
+-r base.txt
+black
+bpython
+pre-commit
+flake8
+commitizen
+pycco
+autoflake
+isort
+pyupgrade

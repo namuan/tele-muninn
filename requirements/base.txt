@@ -1,0 +1,15 @@
+requests
+beautifulsoup4
+slug
+python-dotenv
+schedule
+feedparser
+python-telegram-bot
+finviz
+exif
+dataset
+tweepy
+praw
+pytube
+vaderSentiment
+openai
