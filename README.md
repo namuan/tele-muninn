@@ -39,6 +39,10 @@ options:
 ```
 
 ```
+[_tele_stock_rider_bot.py_](https://namuan.github.io/bin-utils/tele_stock_rider_bot.html)
+```
+
+```
 [_rider_brain_bot.py_](https://namuan.github.io/bin-utils/rider_brain_bot.html)
 ```
 usage: rider_brain_bot.py [-h]

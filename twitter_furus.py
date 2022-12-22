@@ -142,20 +142,13 @@ def main(twitter_accounts, poll_freq_in_secs):
         formatted_posted_dt = tweet_posted_date.strftime("%H:%M(%d %B)")
 
         try:
-            daily_chart, weekly_chart, message = build_chart_links_for(symbol)
+            daily_chart, _, message = build_chart_links_for(symbol)
             header = f"""🚀 #*{symbol}* 👀 posted by [{mention_acct}](https://twitter.com/{mention_acct}/status/{mention_tweet_id}) at {formatted_posted_dt}"""
             send_message_to_telegram(BOT_TOKEN, GROUP_CHAT_ID, header, disable_web_preview=False)
             send_message_to_telegram(
                 BOT_TOKEN,
                 GROUP_CHAT_ID,
                 daily_chart,
-                format="HTML",
-                disable_web_preview=False,
-            )
-            send_message_to_telegram(
-                BOT_TOKEN,
-                GROUP_CHAT_ID,
-                weekly_chart,
                 format="HTML",
                 disable_web_preview=False,
             )

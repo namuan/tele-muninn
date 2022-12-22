@@ -193,20 +193,13 @@
         <span class="n">formatted_posted_dt</span> <span class="o">=</span> <span class="n">tweet_posted_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%H:%M(</span><span class="si">%d</span><span class="s2"> %B)&quot;</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">daily_chart</span><span class="p">,</span> <span class="n">weekly_chart</span><span class="p">,</span> <span class="n">message</span> <span class="o">=</span> <span class="n">build_chart_links_for</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+            <span class="n">daily_chart</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">message</span> <span class="o">=</span> <span class="n">build_chart_links_for</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
             <span class="n">header</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;🚀 #*</span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">* 👀 posted by [</span><span class="si">{</span><span class="n">mention_acct</span><span class="si">}</span><span class="s2">](https://twitter.com/</span><span class="si">{</span><span class="n">mention_acct</span><span class="si">}</span><span class="s2">/status/</span><span class="si">{</span><span class="n">mention_tweet_id</span><span class="si">}</span><span class="s2">) at </span><span class="si">{</span><span class="n">formatted_posted_dt</span><span class="si">}</span><span class="s2">&quot;&quot;&quot;</span>
             <span class="n">send_message_to_telegram</span><span class="p">(</span><span class="n">BOT_TOKEN</span><span class="p">,</span> <span class="n">GROUP_CHAT_ID</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">disable_web_preview</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="n">send_message_to_telegram</span><span class="p">(</span>
                 <span class="n">BOT_TOKEN</span><span class="p">,</span>
                 <span class="n">GROUP_CHAT_ID</span><span class="p">,</span>
                 <span class="n">daily_chart</span><span class="p">,</span>
-                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;HTML&quot;</span><span class="p">,</span>
-                <span class="n">disable_web_preview</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="n">send_message_to_telegram</span><span class="p">(</span>
-                <span class="n">BOT_TOKEN</span><span class="p">,</span>
-                <span class="n">GROUP_CHAT_ID</span><span class="p">,</span>
-                <span class="n">weekly_chart</span><span class="p">,</span>
                 <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;HTML&quot;</span><span class="p">,</span>
                 <span class="n">disable_web_preview</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="p">)</span>
