@@ -38,6 +38,8 @@ deploy: clean ## Copies any changed file to the server
 		twitter_furus_accounts.txt \
 		twitter_furus.py \
 		tele_stock_rider_bot.py \
+		webpages.txt \
+		tele_web_links.py \
 		${PROJECTNAME}:./${PROJECTNAME}
 
 start: deploy ## Sets up a screen session on the server and start the app

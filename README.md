@@ -10,6 +10,17 @@
 ### Scripts
 
 <!-- START makefile-doc -->
+[_tele_web_links.py_](https://namuan.github.io/bin-utils/tele_web_links.html)
+```
+usage: tele_web_links.py [-h] [-v]
+
+Send links to telegram on a schedule
+
+options:
+  -h, --help     show this help message and exit
+  -v, --verbose  Increase verbosity of logging output
+
+```
 [_readme_docs.py_](https://namuan.github.io/bin-utils/readme_docs.html)
 ```
 usage: readme_docs.py [-h]
