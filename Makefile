@@ -34,6 +34,7 @@ deploy: clean ## Copies any changed file to the server
 		twitter_api.py \
 		yt_api.py \
 		rider_brain_bot.py \
+		hn_new_github_repos.py \
 		${PROJECTNAME}:./${PROJECTNAME}
 
 start: deploy ## Sets up a screen session on the server and start the app

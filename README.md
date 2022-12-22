@@ -20,6 +20,21 @@ options:
   -h, --help  show this help message and exit
 
 ```
+[_hn_new_github_repos.py_](https://namuan.github.io/bin-utils/hn_new_github_repos.html)
+```
+usage: hn_new_github_repos.py [-h] [-v]
+
+Find Links to Github/GitLab and Bitbucket from HN new news
+Send links over Telegram
+
+Usage:
+./hn_new_github_repos.py -h
+
+options:
+  -h, --help     show this help message and exit
+  -v, --verbose  Display context variables at each step
+
+```
 [_rider_brain_bot.py_](https://namuan.github.io/bin-utils/rider_brain_bot.html)
 ```
 usage: rider_brain_bot.py [-h]
