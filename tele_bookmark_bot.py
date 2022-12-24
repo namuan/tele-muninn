@@ -42,7 +42,7 @@ RIDER_BRAIN_BOT_TOKEN = os.getenv("RIDER_BRAIN_BOT_TOKEN")
 HOME_DIR = os.getenv("HOME")
 DB_FILE = "rider_brain.db"
 DB_CONNECTION_STRING = f"sqlite:///{HOME_DIR}/{DB_FILE}"
-OUTPUT_DIR = Path.home().joinpath("OutputDir", "web-to-pdf")
+OUTPUT_DIR = Path.home().joinpath("OutputDir", "tele-bookmarks", "web-to-pdf")
 BOOKMARKS_TABLE = "bookmarks"
 
 db = dataset.connect(DB_CONNECTION_STRING)

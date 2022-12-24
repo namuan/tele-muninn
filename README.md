@@ -51,9 +51,10 @@ options:
 ```
 usage: tele_pathy.py [-h] [-v]
 
-Listen to messages with tt and ii prefix
-If a message begins with tt then it'll send a prompt to OpenAI Completion API
-If a message begins with ii then it'll send a prompt to OpenAI Image API
+Receive voice messages from Telegram and convert them to text using OpenAI Whisper
+Then send the text to OpenAI GPT-3 to generate a response
+Then convert the response back to audio using TTS
+Then send the audio back to Telegram
 
 options:
   -h, --help     show this help message and exit
@@ -77,6 +78,10 @@ options:
                         Wait (in secs) before capturing screenshot
   -s, --headless        Run headless (no browser window)
   -v, --verbose         Increase verbosity of logging output
+
+```
+[_openai_api.py_](https://namuan.github.io/tele-muninn/openai_api.html)
+```
 
 ```
 [_hn_new_github_repos.py_](https://namuan.github.io/tele-muninn/hn_new_github_repos.html)

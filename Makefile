@@ -41,6 +41,7 @@ deploy: clean ## Copies any changed file to the server
 		tele_stock_rider_bot.py \
 		webpages.txt \
 		tele_web_links.py \
+		openai_api.py \
 		tele_openai_bot.py \
 		${PROJECTNAME}:./${PROJECTNAME}
 

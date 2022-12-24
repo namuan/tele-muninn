@@ -9,7 +9,6 @@ import os
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from typing import Optional, Type
 
-import openai
 import telegram
 from dotenv import load_dotenv
 from telegram import Update
@@ -22,13 +21,11 @@ from telegram.ext import (
 )
 
 from common_utils import build_chart_links_for, retry, setup_logging, verified_chat_id
+from openai_api import completions, image_creation
 
 load_dotenv()
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 TELE_MUNINN_OPENAI_BOT = os.getenv("TELE_MUNINN_OPENAI_BOT")
-
-openai.api_key = OPENAI_API_KEY
 
 
 def start(update: Update, _) -> None:
@@ -68,25 +65,15 @@ class BaseHandler:
 
 class OpenAiText(BaseHandler):
     def process(self):
-        completion = openai.Completion.create(engine="text-davinci-003", prompt=self.text, max_tokens=300)
-        if completion.choices:
-            self.bot.send_message(
-                self.cid, completion.choices[0].text, disable_web_page_preview=True, parse_mode="Markdown"
-            )
-        else:
-            self.bot.send_message(
-                self.cid,
-                f"No completion found for {self.text}",
-                disable_web_page_preview=True,
-                parse_mode="Markdown",
-            )
+        prompt_response = completions(self.text)
+        self.bot.send_message(self.cid, prompt_response, disable_web_page_preview=True, parse_mode="Markdown")
 
 
 class OpenAiImage(BaseHandler):
     def process(self):
-        image_resp = openai.Image.create(prompt=self.text, n=4, size="512x512")
-        if image_resp:
-            for image in image_resp["data"]:
+        image_response = image_creation(self.text)
+        if image_response:
+            for image in image_response["data"]:
                 logging.info("Sending image %s", image)
                 self.bot.send_photo(self.cid, image["url"])
         else:
