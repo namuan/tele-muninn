@@ -47,6 +47,19 @@ options:
   -h, --help  show this help message and exit
 
 ```
+[_tele_pathy.py_](https://namuan.github.io/tele-muninn/tele_pathy.html)
+```
+usage: tele_pathy.py [-h] [-v]
+
+Listen to messages with tt and ii prefix
+If a message begins with tt then it'll send a prompt to OpenAI Completion API
+If a message begins with ii then it'll send a prompt to OpenAI Image API
+
+options:
+  -h, --help     show this help message and exit
+  -v, --verbose  Increase verbosity of logging output
+
+```
 [_webpage_to_pdf.py_](https://namuan.github.io/tele-muninn/webpage_to_pdf.html)
 ```
 usage: webpage_to_pdf.py [-h] -i INPUT_URL -o OUTPUT_FILE_PATH
@@ -68,6 +81,30 @@ options:
 ```
 [_hn_new_github_repos.py_](https://namuan.github.io/tele-muninn/hn_new_github_repos.html)
 ```
+usage: hn_new_github_repos.py [-h] [-v]
+
+Find Links to Github/GitLab and Bitbucket from HN new news
+Send links over Telegram
+
+Usage:
+./hn_new_github_repos.py -h
+
+options:
+  -h, --help     show this help message and exit
+  -v, --verbose  Display context variables at each step
+
+```
+[_bot_template.py_](https://namuan.github.io/tele-muninn/bot_template.html)
+```
+usage: bot_template.py [-h] [-v]
+
+Listen to messages with tt and ii prefix
+If a message begins with tt then it'll send a prompt to OpenAI Completion API
+If a message begins with ii then it'll send a prompt to OpenAI Image API
+
+options:
+  -h, --help     show this help message and exit
+  -v, --verbose  Increase verbosity of logging output
 
 ```
 [_twitter_furus.py_](https://namuan.github.io/tele-muninn/twitter_furus.html)

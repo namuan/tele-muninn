@@ -199,7 +199,7 @@ def main(context):
 
 
 if __name__ == "__main__":
-    setup_logging()
     args = parse_args()
+    setup_logging(args.verbose)
     main(args.__dict__)
     # run_on_schedule(args.__dict__)

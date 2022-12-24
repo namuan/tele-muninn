@@ -198,10 +198,14 @@ def build_chart_links_for(ticker):
 
 def verified_chat_id(chat_id):
     auth_chat_id = os.getenv("AUTH_CHAT_ID")
-    if chat_id != int(auth_chat_id):
-        logging.warning(f"🚫 Chat ID {chat_id} is not authorized. Authorized Chat Id: {auth_chat_id}")
+    personal_chat_id = os.getenv("PERSONAL_AUTH_CHAT_ID")
+    if str(chat_id) == auth_chat_id or str(chat_id) == personal_chat_id:
+        return True
+    else:
+        logging.warning(
+            f"🚫 Chat ID {chat_id} is not authorized. Authorized Chat Id: {auth_chat_id} or {personal_chat_id}"
+        )
         return False
-    return True
 
 
 if __name__ == "__main__":
