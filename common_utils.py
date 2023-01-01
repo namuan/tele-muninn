@@ -14,6 +14,7 @@ from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
+from rich.logging import RichHandler
 
 
 def setup_logging(verbosity):
@@ -25,7 +26,7 @@ def setup_logging(verbosity):
 
     logging.basicConfig(
         handlers=[
-            logging.StreamHandler(),
+            RichHandler(),
         ],
         format="%(asctime)s - %(filename)s:%(lineno)d - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",

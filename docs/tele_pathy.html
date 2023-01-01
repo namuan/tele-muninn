@@ -39,6 +39,7 @@ Then send the audio back to Telegram</p>
     <span class="n">Updater</span><span class="p">,</span>
 <span class="p">)</span>
 
+<span class="kn">import</span> <span class="nn">voice_to_openai</span>
 <span class="kn">from</span> <span class="nn">common_utils</span> <span class="kn">import</span> <span class="n">retry</span><span class="p">,</span> <span class="n">setup_logging</span><span class="p">,</span> <span class="n">uuid_gen</span><span class="p">,</span> <span class="n">verified_chat_id</span>
 
 <span class="n">load_dotenv</span><span class="p">()</span>
@@ -96,45 +97,6 @@ Then send the audio back to Telegram</p>
       <div class='octowrap'>
         <a class='octothorpe' href='#section-4'>#</a>
       </div>
-      
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre><span class="k">def</span> <span class="nf">whisper_to_text</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
-    <span class="k">return</span> <span class="s2">&quot;Hello world&quot;</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-5'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-5'>#</a>
-      </div>
-      
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre><span class="k">def</span> <span class="nf">text_to_openai</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
-    <span class="k">return</span> <span class="s2">&quot;Hello world&quot;</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-6'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-6'>#</a>
-      </div>
-      
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre><span class="k">def</span> <span class="nf">text_to_speech</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
-    <span class="k">return</span> <span class="s2">&quot;Hello world&quot;</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-7'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-7'>#</a>
-      </div>
       <p>Start the bot.</p>
     </div>
     <div class='code'>
@@ -146,11 +108,9 @@ Then send the audio back to Telegram</p>
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Received voice message: </span><span class="si">{</span><span class="n">update</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">chat_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">message_sent</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">chat_id</span><span class="o">=</span><span class="n">chat_id</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;🎤 Processing voice message&quot;</span><span class="p">)</span>
     <span class="n">file_path</span> <span class="o">=</span> <span class="n">save_voice_file</span><span class="p">(</span><span class="n">update</span><span class="p">)</span>
-    <span class="n">text</span> <span class="o">=</span> <span class="n">whisper_to_text</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
-    <span class="n">response</span> <span class="o">=</span> <span class="n">text_to_openai</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-    <span class="n">text_to_speech</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sending audio response to </span><span class="si">{</span><span class="n">chat_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">context</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">send_voice</span><span class="p">(</span><span class="n">chat_id</span><span class="o">=</span><span class="n">chat_id</span><span class="p">,</span> <span class="n">voice</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">))</span>
+    <span class="n">generated_output_file_path</span> <span class="o">=</span> <span class="n">voice_to_openai</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sending audio response at </span><span class="si">{</span><span class="n">generated_output_file_path</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">chat_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">context</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">send_voice</span><span class="p">(</span><span class="n">chat_id</span><span class="o">=</span><span class="n">chat_id</span><span class="p">,</span> <span class="n">voice</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">generated_output_file_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">))</span>
     <span class="n">context</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">delete_message</span><span class="p">(</span><span class="n">chat_id</span><span class="o">=</span><span class="n">chat_id</span><span class="p">,</span> <span class="n">message_id</span><span class="o">=</span><span class="n">message_sent</span><span class="o">.</span><span class="n">message_id</span><span class="p">)</span>
 
 
@@ -158,10 +118,10 @@ Then send the audio back to Telegram</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-8'>
+  <div class='section' id='section-5'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-8'>#</a>
+        <a class='octothorpe' href='#section-5'>#</a>
       </div>
       
     </div>
@@ -171,7 +131,7 @@ Then send the audio back to Telegram</p>
         <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;🚫 Please make sure that you set the correct environment variable.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;🤖 Telegram bot token: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">BOT_TOKEN</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span> <span class="o">+</span> <span class="n">BOT_TOKEN</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">:])</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;🤖 Telegram bot token: &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span><span class="p">,</span> <span class="n">BOT_TOKEN</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span> <span class="o">+</span> <span class="n">BOT_TOKEN</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">:])</span>
 
     <span class="n">updater</span> <span class="o">=</span> <span class="n">Updater</span><span class="p">(</span><span class="n">BOT_TOKEN</span><span class="p">,</span> <span class="n">use_context</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -187,10 +147,10 @@ Then send the audio back to Telegram</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-9'>
+  <div class='section' id='section-6'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-9'>#</a>
+        <a class='octothorpe' href='#section-6'>#</a>
       </div>
       
     </div>
@@ -209,10 +169,10 @@ Then send the audio back to Telegram</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-10'>
+  <div class='section' id='section-7'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-10'>#</a>
+        <a class='octothorpe' href='#section-7'>#</a>
       </div>
       
     </div>

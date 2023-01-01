@@ -28,16 +28,8 @@ def parse_args():
 def main(args):
     # These files will be ignored during processing
     ignored_files = [
-        "page_to_pdf_selenium.py",
-        "file_counter.py",
-        "phpbb_thread.py",
-        "download_html_to_file.py",
-        "generate_paypal_errors.py",
-        "firefox_browser_session.py",
+        "voice_to_openai.py",
         "common_utils.py",
-        "flatten_directory.py",
-        "git_log_to_sqlite.py",
-        "reddit_api.py",
         "twitter_api.py",
         "yt_api.py",
     ]

@@ -21,6 +21,7 @@ from telegram.ext import (
     Updater,
 )
 
+import voice_to_openai
 from common_utils import retry, setup_logging, uuid_gen, verified_chat_id
 
 load_dotenv()
@@ -45,18 +46,6 @@ def save_voice_file(update: Update):
     return file_path
 
 
-def whisper_to_text(file_path):
-    return "Hello world"
-
-
-def text_to_openai(text):
-    return "Hello world"
-
-
-def text_to_speech(text):
-    return "Hello world"
-
-
 @retry(telegram.error.TimedOut, tries=3)
 def handle_voice_message(update: Update, context: CallbackContext) -> None:
     chat_id = update.effective_chat.id
@@ -65,11 +54,9 @@ def handle_voice_message(update: Update, context: CallbackContext) -> None:
     logging.info(f"Received voice message: {update} from {chat_id}")
     message_sent = context.bot.send_message(chat_id=chat_id, text="🎤 Processing voice message")
     file_path = save_voice_file(update)
-    text = whisper_to_text(file_path)
-    response = text_to_openai(text)
-    text_to_speech(response)
-    logging.info(f"Sending audio response to {chat_id}")
-    context.bot.send_voice(chat_id=chat_id, voice=open(file_path, "rb"))
+    generated_output_file_path = voice_to_openai.run(file_path)
+    logging.info(f"Sending audio response at {generated_output_file_path} to {chat_id}")
+    context.bot.send_voice(chat_id=chat_id, voice=open(generated_output_file_path, "rb"))
     context.bot.delete_message(chat_id=chat_id, message_id=message_sent.message_id)
 
 
@@ -80,7 +67,7 @@ def main():
         logging.error("🚫 Please make sure that you set the correct environment variable.")
         return False
     else:
-        logging.info("🤖 Telegram bot token: %s", BOT_TOKEN[:5] + "..." + BOT_TOKEN[-5:])
+        logging.info('🤖 Telegram bot token: "%s"', BOT_TOKEN[:5] + "..." + BOT_TOKEN[-5:])
 
     updater = Updater(BOT_TOKEN, use_context=True)
 
