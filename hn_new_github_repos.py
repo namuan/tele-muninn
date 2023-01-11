@@ -102,7 +102,8 @@ class SendToTelegram(WorkflowBase):
                     send_message_to_telegram(DEFAULT_BOT_TOKEN, GROUP_CHAT_ID, link, disable_web_preview=False)
                     logging.info(f"Sent {link}")
                 except Exception as e:
-                    logging.error(f"Unable to send telegram message for {link}", e)
+                    error_message = f"Unable to send {link} to Telegram"
+                    logging.error(error_message, e)
 
 
 class FilterExistingLinks(WorkflowBase):
