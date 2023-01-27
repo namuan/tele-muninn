@@ -141,6 +141,18 @@ class Photo(BaseHandler):
         return target_file.as_posix()
 
 
+class Document(BaseHandler):
+    def __init__(self, note, document_file):
+        super().__init__(note)
+        self.document_file = document_file
+
+    def _bookmark(self) -> str:
+        target_file = OUTPUT_DIR / self.note
+        self.document_file.download(target_file)
+        logging.info(f"Document saved: {target_file}")
+        return target_file.as_posix()
+
+
 def message_handler_for(incoming_text) -> BaseHandler:
     if not incoming_text.startswith("http"):
         return PlainTextNote(incoming_text)
@@ -161,19 +173,29 @@ def message_handler_for(incoming_text) -> BaseHandler:
     return WebPage(incoming_url)
 
 
-def process_photo(update: Update) -> None:
+def process_photo(update: Update) -> str:
     original_message_id = update.message.message_id
     update_message_text = update.message.text
 
     photo_file = update.message.photo[-1].get_file()
-    photo_handler = Photo(update_message_text or original_message_id, photo_file)
+    photo_identifier = update_message_text or original_message_id
+    photo_handler = Photo(photo_identifier, photo_file)
     photo_handler.bookmark()
+    return f"Photo {photo_identifier}"
 
 
 def process_message(update: Update) -> None:
     update_message_text = update.message.text
     message_handler = message_handler_for(update_message_text)
     message_handler.bookmark()
+
+
+def process_document(update) -> str:
+    document_name = update.message.document.file_name
+    document_file = update.message.document.get_file()
+    document_handler = Document(document_name, document_file)
+    document_handler.bookmark()
+    return document_name
 
 
 @retry(telegram.error.TimedOut, tries=3)
@@ -196,7 +218,9 @@ def adapter(update: Update, context):
         )
 
         if update.message.photo:
-            process_photo(update)
+            update_message_text = process_photo(update)
+        elif update.message.document:
+            update_message_text = process_document(update)
         else:
             process_message(update)
 

@@ -364,6 +364,48 @@
       
     </div>
     <div class='code'>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">Document</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-22'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-22'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">note</span><span class="p">,</span> <span class="n">document_file</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">note</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">document_file</span> <span class="o">=</span> <span class="n">document_file</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-23'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-23'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">_bookmark</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">target_file</span> <span class="o">=</span> <span class="n">OUTPUT_DIR</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">note</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">document_file</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">target_file</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Document saved: </span><span class="si">{</span><span class="n">target_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">target_file</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-24'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-24'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
       <div class="highlight"><pre><span class="k">def</span> <span class="nf">message_handler_for</span><span class="p">(</span><span class="n">incoming_text</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BaseHandler</span><span class="p">:</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">incoming_text</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">PlainTextNote</span><span class="p">(</span><span class="n">incoming_text</span><span class="p">)</span>
@@ -385,28 +427,30 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-22'>
+  <div class='section' id='section-25'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-22'>#</a>
+        <a class='octothorpe' href='#section-25'>#</a>
       </div>
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span class="k">def</span> <span class="nf">process_photo</span><span class="p">(</span><span class="n">update</span><span class="p">:</span> <span class="n">Update</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">process_photo</span><span class="p">(</span><span class="n">update</span><span class="p">:</span> <span class="n">Update</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="n">original_message_id</span> <span class="o">=</span> <span class="n">update</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">message_id</span>
     <span class="n">update_message_text</span> <span class="o">=</span> <span class="n">update</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">text</span>
 
     <span class="n">photo_file</span> <span class="o">=</span> <span class="n">update</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">photo</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_file</span><span class="p">()</span>
-    <span class="n">photo_handler</span> <span class="o">=</span> <span class="n">Photo</span><span class="p">(</span><span class="n">update_message_text</span> <span class="ow">or</span> <span class="n">original_message_id</span><span class="p">,</span> <span class="n">photo_file</span><span class="p">)</span>
-    <span class="n">photo_handler</span><span class="o">.</span><span class="n">bookmark</span><span class="p">()</span></pre></div>
+    <span class="n">photo_identifier</span> <span class="o">=</span> <span class="n">update_message_text</span> <span class="ow">or</span> <span class="n">original_message_id</span>
+    <span class="n">photo_handler</span> <span class="o">=</span> <span class="n">Photo</span><span class="p">(</span><span class="n">photo_identifier</span><span class="p">,</span> <span class="n">photo_file</span><span class="p">)</span>
+    <span class="n">photo_handler</span><span class="o">.</span><span class="n">bookmark</span><span class="p">()</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Photo </span><span class="si">{</span><span class="n">photo_identifier</span><span class="si">}</span><span class="s2">&quot;</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-23'>
+  <div class='section' id='section-26'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-23'>#</a>
+        <a class='octothorpe' href='#section-26'>#</a>
       </div>
       
     </div>
@@ -418,10 +462,27 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-24'>
+  <div class='section' id='section-27'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-24'>#</a>
+        <a class='octothorpe' href='#section-27'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">process_document</span><span class="p">(</span><span class="n">update</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">document_name</span> <span class="o">=</span> <span class="n">update</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">file_name</span>
+    <span class="n">document_file</span> <span class="o">=</span> <span class="n">update</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">get_file</span><span class="p">()</span>
+    <span class="n">document_handler</span> <span class="o">=</span> <span class="n">Document</span><span class="p">(</span><span class="n">document_name</span><span class="p">,</span> <span class="n">document_file</span><span class="p">)</span>
+    <span class="n">document_handler</span><span class="o">.</span><span class="n">bookmark</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">document_name</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-28'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-28'>#</a>
       </div>
       <p>Start bot and hook callback functions</p>
     </div>
@@ -446,7 +507,9 @@
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">update</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">photo</span><span class="p">:</span>
-            <span class="n">process_photo</span><span class="p">(</span><span class="n">update</span><span class="p">)</span>
+            <span class="n">update_message_text</span> <span class="o">=</span> <span class="n">process_photo</span><span class="p">(</span><span class="n">update</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">update</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">document</span><span class="p">:</span>
+            <span class="n">update_message_text</span> <span class="o">=</span> <span class="n">process_document</span><span class="p">(</span><span class="n">update</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">process_message</span><span class="p">(</span><span class="n">update</span><span class="p">)</span>
 
@@ -464,10 +527,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-25'>
+  <div class='section' id='section-29'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-25'>#</a>
+        <a class='octothorpe' href='#section-29'>#</a>
       </div>
       
     </div>
@@ -491,10 +554,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-26'>
+  <div class='section' id='section-30'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-26'>#</a>
+        <a class='octothorpe' href='#section-30'>#</a>
       </div>
       
     </div>
@@ -504,10 +567,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-27'>
+  <div class='section' id='section-31'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-27'>#</a>
+        <a class='octothorpe' href='#section-31'>#</a>
       </div>
       
     </div>
