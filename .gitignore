@@ -134,3 +134,4 @@ dmypy.json
 # Other custom files
 webpages.txt
 twitter_furus_accounts.txt
+output_dir/
