@@ -58,6 +58,7 @@ syncdatabases: ## Copy databases from remote to local
 	rm -rf output_dir/*.db
 	rsync -avzr ${PROJECTNAME}:./hn_new_github_repos.* output_dir/
 	rsync -avzr ${PROJECTNAME}:./rider_brain.* output_dir/
+	rsync -avzr ${PROJECTNAME}:./OutputDir/tele-bookmarks/* output_dir/tele-bookmarks/
 
 bpython: ## Runs bpython
 	venv/bin/bpython
