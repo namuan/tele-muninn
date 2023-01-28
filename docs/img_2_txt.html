@@ -53,6 +53,7 @@
         <span class="n">tesseract_command</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;tesseract </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">image_file_path</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">text_path</span><span class="si">}</span><span class="s2"> --oem 1 -l eng&quot;</span>
         <span class="n">run_command</span><span class="p">(</span><span class="n">tesseract_command</span><span class="p">)</span>
         <span class="n">converted_text</span> <span class="o">=</span> <span class="n">text_path</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.txt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
+        <span class="n">text_path</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.txt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;converted_text&quot;</span><span class="p">:</span> <span class="n">converted_text</span><span class="p">}</span></pre></div>
     </div>
   </div>

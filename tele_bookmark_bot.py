@@ -184,12 +184,19 @@ def process_photo(update: Update) -> str:
     photo_handler = Photo(photo_identifier, photo_file)
     photo_file_path = photo_handler.bookmark()
 
-    update_message_caption = update.message.caption.lower()
+    update_message_caption = stripped_caption(update)
     if update_message_caption == "ocr":
         converted_text = img_2_txt.main(photo_file_path)
         update.message.reply_text(converted_text)
 
     return f"Photo {photo_identifier}"
+
+
+def stripped_caption(update):
+    if update.message.caption:
+        return update.message.caption.strip().lower()
+    else:
+        return ""
 
 
 def process_message(update: Update) -> None:
@@ -242,6 +249,7 @@ def adapter(update: Update, context):
         raise e
 
 
+@retry(telegram.error.NetworkError, tries=3)
 def start_bot():
     """Start bot and hook callback functions"""
     logging.info("🏗 Starting bot")

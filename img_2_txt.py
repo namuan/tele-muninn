@@ -12,6 +12,7 @@ class ConvertImageToText(WorkflowBase):
         tesseract_command = f"tesseract {self.image_file_path} {text_path} --oem 1 -l eng"
         run_command(tesseract_command)
         converted_text = text_path.with_suffix(".txt").read_text()
+        text_path.with_suffix(".txt").unlink()
         return {"converted_text": converted_text}
 
 
