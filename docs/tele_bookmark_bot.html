@@ -30,15 +30,16 @@
 <span class="kn">import</span> <span class="nn">dataset</span>
 <span class="kn">import</span> <span class="nn">telegram</span>
 <span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
+<span class="kn">from</span> <span class="nn">py_executable_checklist.workflow</span> <span class="kn">import</span> <span class="n">run_command</span>
 <span class="kn">from</span> <span class="nn">slug</span> <span class="kn">import</span> <span class="n">slug</span>
 <span class="kn">from</span> <span class="nn">telegram</span> <span class="kn">import</span> <span class="n">Update</span>
 <span class="kn">from</span> <span class="nn">telegram.ext</span> <span class="kn">import</span> <span class="n">CommandHandler</span><span class="p">,</span> <span class="n">Filters</span><span class="p">,</span> <span class="n">MessageHandler</span><span class="p">,</span> <span class="n">Updater</span>
 
+<span class="kn">import</span> <span class="nn">img_2_txt</span>
 <span class="kn">from</span> <span class="nn">common_utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">fetch_html_page</span><span class="p">,</span>
     <span class="n">html_parser_from</span><span class="p">,</span>
     <span class="n">retry</span><span class="p">,</span>
-    <span class="n">run_command</span><span class="p">,</span>
     <span class="n">setup_logging</span><span class="p">,</span>
     <span class="n">verified_chat_id</span><span class="p">,</span>
 <span class="p">)</span>
@@ -440,9 +441,16 @@
     <span class="n">update_message_text</span> <span class="o">=</span> <span class="n">update</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">text</span>
 
     <span class="n">photo_file</span> <span class="o">=</span> <span class="n">update</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">photo</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_file</span><span class="p">()</span>
+
     <span class="n">photo_identifier</span> <span class="o">=</span> <span class="n">update_message_text</span> <span class="ow">or</span> <span class="n">original_message_id</span>
     <span class="n">photo_handler</span> <span class="o">=</span> <span class="n">Photo</span><span class="p">(</span><span class="n">photo_identifier</span><span class="p">,</span> <span class="n">photo_file</span><span class="p">)</span>
-    <span class="n">photo_handler</span><span class="o">.</span><span class="n">bookmark</span><span class="p">()</span>
+    <span class="n">photo_file_path</span> <span class="o">=</span> <span class="n">photo_handler</span><span class="o">.</span><span class="n">bookmark</span><span class="p">()</span>
+
+    <span class="n">update_message_caption</span> <span class="o">=</span> <span class="n">update</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">caption</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">update_message_caption</span> <span class="o">==</span> <span class="s2">&quot;ocr&quot;</span><span class="p">:</span>
+        <span class="n">converted_text</span> <span class="o">=</span> <span class="n">img_2_txt</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">photo_file_path</span><span class="p">)</span>
+        <span class="n">update</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">reply_text</span><span class="p">(</span><span class="n">converted_text</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Photo </span><span class="si">{</span><span class="n">photo_identifier</span><span class="si">}</span><span class="s2">&quot;</span></pre></div>
     </div>
   </div>

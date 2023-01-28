@@ -6,7 +6,6 @@ import random
 import re
 import shutil
 import string
-import subprocess
 import time
 import uuid
 from functools import wraps
@@ -141,11 +140,6 @@ def http_get_request(url: str, headers: dict = None, timeout: int = 10) -> dict:
         raise Exception(f"Failed to get {url} with status code {response.status_code}")
     else:
         return response.json()
-
-
-def run_command(command: str) -> str:
-    logging.info("⚡ %s", command)
-    return subprocess.check_output(command, shell=True).decode("utf-8")  # nosemgrep
 
 
 def uuid_gen():

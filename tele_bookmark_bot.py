@@ -12,15 +12,16 @@ from urllib.parse import urlparse
 import dataset
 import telegram
 from dotenv import load_dotenv
+from py_executable_checklist.workflow import run_command
 from slug import slug
 from telegram import Update
 from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
 
+import img_2_txt
 from common_utils import (
     fetch_html_page,
     html_parser_from,
     retry,
-    run_command,
     setup_logging,
     verified_chat_id,
 )
@@ -178,9 +179,16 @@ def process_photo(update: Update) -> str:
     update_message_text = update.message.text
 
     photo_file = update.message.photo[-1].get_file()
+
     photo_identifier = update_message_text or original_message_id
     photo_handler = Photo(photo_identifier, photo_file)
-    photo_handler.bookmark()
+    photo_file_path = photo_handler.bookmark()
+
+    update_message_caption = update.message.caption.lower()
+    if update_message_caption == "ocr":
+        converted_text = img_2_txt.main(photo_file_path)
+        update.message.reply_text(converted_text)
+
     return f"Photo {photo_identifier}"
 
 

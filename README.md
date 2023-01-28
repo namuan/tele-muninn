@@ -80,6 +80,10 @@ options:
   -v, --verbose         Increase verbosity of logging output
 
 ```
+[_img_2_txt.py_](https://namuan.github.io/tele-muninn/img_2_txt.html)
+```
+
+```
 [_openai_api.py_](https://namuan.github.io/tele-muninn/openai_api.html)
 ```
 

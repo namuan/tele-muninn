@@ -43,6 +43,7 @@ deploy: clean ## Copies any changed file to the server
 		tele_web_links.py \
 		openai_api.py \
 		tele_openai_bot.py \
+		img_2_txt.py \
 		${PROJECTNAME}:./${PROJECTNAME}
 
 start: deploy ## Sets up a screen session on the server and start the app
