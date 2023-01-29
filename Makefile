@@ -7,7 +7,7 @@ setup: ## Setup Virtual Env
 	venv/bin/pip3 install -r requirements/dev.txt
 
 deps: ## Install dependencies
-	venv/bin/pip3 install -r requirements/dev.txt
+	venv/bin/pip3 install --upgrade -r requirements/dev.txt
 	venv/bin/python3 -m pip install --upgrade pip
 
 clean: ## Clean package
@@ -44,6 +44,7 @@ deploy: clean ## Copies any changed file to the server
 		openai_api.py \
 		tele_openai_bot.py \
 		img_2_txt.py \
+		tele-social-vdo.py \
 		${PROJECTNAME}:./${PROJECTNAME}
 
 start: deploy ## Sets up a screen session on the server and start the app

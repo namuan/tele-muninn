@@ -15,6 +15,21 @@ Collection of Telegram bots
 ### Scripts
 
 <!-- START makefile-doc -->
+[_tele-social-vdo.py_](https://namuan.github.io/tele-muninn/tele-social-vdo.html)
+```
+usage: tele-social-vdo.py [-h] [-i INPUT_URL] [-b] [-v]
+
+Telegram bot to download videos from social media websites
+
+options:
+  -h, --help            show this help message and exit
+  -i INPUT_URL, --input-url INPUT_URL
+                        Input url
+  -b, --run-as-bot      Run as telegram bot
+  -v, --verbose         Increase verbosity of logging output. Display context
+                        variables between each step run
+
+```
 [_tele_bookmark_bot.py_](https://namuan.github.io/tele-muninn/tele_bookmark_bot.html)
 ```
 usage: tele_bookmark_bot.py [-h] [-v]
