@@ -31,6 +31,9 @@ def main(args):
         "voice_to_openai.py",
         "common_utils.py",
         "twitter_api.py",
+        "openai_api.py",
+        "img_2_txt.py",
+        "readme_docs.py",
         "yt_api.py",
     ]
     py_scripts_with_help = []

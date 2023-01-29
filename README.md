@@ -37,16 +37,6 @@ options:
   -v, --verbose  Increase verbosity of logging output
 
 ```
-[_readme_docs.py_](https://namuan.github.io/tele-muninn/readme_docs.html)
-```
-usage: readme_docs.py [-h]
-
-Generates documentation for the readme.md file
-
-options:
-  -h, --help  show this help message and exit
-
-```
 [_tele_pathy.py_](https://namuan.github.io/tele-muninn/tele_pathy.html)
 ```
 usage: tele_pathy.py [-h] [-v]
@@ -78,14 +68,6 @@ options:
                         Wait (in secs) before capturing screenshot
   -s, --headless        Run headless (no browser window)
   -v, --verbose         Increase verbosity of logging output
-
-```
-[_img_2_txt.py_](https://namuan.github.io/tele-muninn/img_2_txt.html)
-```
-
-```
-[_openai_api.py_](https://namuan.github.io/tele-muninn/openai_api.html)
-```
 
 ```
 [_hn_new_github_repos.py_](https://namuan.github.io/tele-muninn/hn_new_github_repos.html)
