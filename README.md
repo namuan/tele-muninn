@@ -168,25 +168,10 @@ options:
 ```
 <!-- END makefile-doc -->
 
-### DEV: Setting up Pre-commit hooks
-
-Add following dependencies in requirements/dev.txt
-```
-pre-commit
-black
-flake8
-...
-```
+### Development
 
 Run `make deps` to update dependencies
 
-Create following files and add appropriate configurations
-```
-touch .flake8
-touch .pre-commit-config.yaml
-touch .pyproject.toml
-```
-
-Run `pre-commit install` to setup git hooks.
+Run `make pre-commit` to all the pre-commit hooks
 
 Commit and push all the changes
