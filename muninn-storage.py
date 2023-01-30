@@ -2,13 +2,17 @@
 """
 Copy local files to GDrive remote storage
 """
+import functools
 import logging
 import os
+import time
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict
 
 import dataset
+import schedule
 from dataset.table import Table
 from dotenv import load_dotenv
 from google.auth.transport.requests import Request
@@ -26,6 +30,8 @@ GDRIVE_REMOTE_FOLDER_ID = os.getenv("GDRIVE_REMOTE_FOLDER_ID")
 SCOPES = [
     "https://www.googleapis.com/auth/drive",
 ]
+
+logging.getLogger("googleapiclient.discovery_cache").setLevel(logging.ERROR)
 
 
 class ConnectToDatabase(WorkflowBase):
@@ -81,7 +87,7 @@ class SelectPendingBookmarksToUpload(WorkflowBase):
 
     def execute(self) -> dict:
         logging.info("Selecting next batch of files to upload from %s table", self.db_table.name)
-        web_pages = self.db_table.find(source="WebPage", remote_file_id=None, _limit=1)
+        web_pages = self.db_table.find(source="WebPage", remote_file_id=None, _limit=5)
         local_archived_files = {web_page["id"]: Path(web_page["content"]) for web_page in web_pages}
         return {"local_files": local_archived_files}
 
@@ -124,6 +130,9 @@ def parse_args():
         "-t", "--token-file", type=Path, required=True, help="Token file for authenticated GDrive access"
     )
     parser.add_argument(
+        "-b", "--batch", action="store_true", default=False, help="Run in batch mode (no scheduling, just run once)"
+    )
+    parser.add_argument(
         "-v",
         "--verbose",
         action="count",
@@ -134,11 +143,24 @@ def parse_args():
     return parser.parse_args()
 
 
-def main(context):
+def run_on_schedule(context):
     run_workflow(context, workflow())
 
 
+def main(context):
+    if context["batch"]:
+        run_workflow(context, workflow())
+        return
+
+    print(f"Checking at: {datetime.now()}")
+    schedule.every(60).minutes.do(functools.partial(run_on_schedule, context))
+    while True:
+        schedule.run_pending()
+        time.sleep(10 * 60)
+
+
 if __name__ == "__main__":
+    print("Running Muninn-Storage")
     args = parse_args()
     setup_logging(args.verbose)
     context = args.__dict__

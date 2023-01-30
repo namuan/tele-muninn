@@ -30,6 +30,7 @@ deploy: clean ## Copies any changed file to the server
 		.env \
 		requirements \
 		scripts \
+		secret-keys \
 		common_utils.py \
 		twitter_api.py \
 		yt_api.py \

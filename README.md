@@ -32,7 +32,8 @@ options:
 ```
 [_muninn-storage.py_](https://namuan.github.io/tele-muninn/muninn-storage.html)
 ```
-usage: muninn-storage.py [-h] -d DATABASE_FILE_PATH -t TOKEN_FILE [-v]
+Running Muninn-Storage
+usage: muninn-storage.py [-h] -d DATABASE_FILE_PATH -t TOKEN_FILE [-b] [-v]
 
 Copy local files to GDrive remote storage
 
@@ -42,6 +43,7 @@ options:
                         Path to database file
   -t TOKEN_FILE, --token-file TOKEN_FILE
                         Token file for authenticated GDrive access
+  -b, --batch           Run in batch mode (no scheduling, just run once)
   -v, --verbose         Increase verbosity of logging output. Display context
                         variables between each step run
 
