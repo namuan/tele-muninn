@@ -30,6 +30,22 @@ options:
                         variables between each step run
 
 ```
+[_muninn-storage.py_](https://namuan.github.io/tele-muninn/muninn-storage.html)
+```
+usage: muninn-storage.py [-h] -d DATABASE_FILE_PATH -t TOKEN_FILE [-v]
+
+Copy local files to GDrive remote storage
+
+options:
+  -h, --help            show this help message and exit
+  -d DATABASE_FILE_PATH, --database-file-path DATABASE_FILE_PATH
+                        Path to database file
+  -t TOKEN_FILE, --token-file TOKEN_FILE
+                        Token file for authenticated GDrive access
+  -v, --verbose         Increase verbosity of logging output. Display context
+                        variables between each step run
+
+```
 [_tele_bookmark_bot.py_](https://namuan.github.io/tele-muninn/tele_bookmark_bot.html)
 ```
 usage: tele_bookmark_bot.py [-h] [-v]

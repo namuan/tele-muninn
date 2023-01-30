@@ -40,10 +40,11 @@ logging.captureWarnings(capture=True)
 
 RIDER_BRAIN_BOT_TOKEN = os.getenv("RIDER_BRAIN_BOT_TOKEN")
 
+OUTPUT_DIR = Path.home().joinpath("OutputDir", "tele-bookmarks", "web-to-pdf")
+
 HOME_DIR = os.getenv("HOME")
 DB_FILE = "rider_brain.db"
 DB_CONNECTION_STRING = f"sqlite:///{HOME_DIR}/{DB_FILE}"
-OUTPUT_DIR = Path.home().joinpath("OutputDir", "tele-bookmarks", "web-to-pdf")
 BOOKMARKS_TABLE = "bookmarks"
 
 db = dataset.connect(DB_CONNECTION_STRING)
@@ -97,6 +98,7 @@ class BaseHandler:
             "note": self.note,
             "created_at": datetime.now(),
             "content": archived_entry,
+            "remote_file_id": None,
         }
         bookmarks_table.insert(entry_row)
         logging.info(f"Updated database: {entry_row}")

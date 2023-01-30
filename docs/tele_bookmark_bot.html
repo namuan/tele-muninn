@@ -58,10 +58,11 @@
 
 <span class="n">RIDER_BRAIN_BOT_TOKEN</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;RIDER_BRAIN_BOT_TOKEN&quot;</span><span class="p">)</span>
 
+<span class="n">OUTPUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;OutputDir&quot;</span><span class="p">,</span> <span class="s2">&quot;tele-bookmarks&quot;</span><span class="p">,</span> <span class="s2">&quot;web-to-pdf&quot;</span><span class="p">)</span>
+
 <span class="n">HOME_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">)</span>
 <span class="n">DB_FILE</span> <span class="o">=</span> <span class="s2">&quot;rider_brain.db&quot;</span>
 <span class="n">DB_CONNECTION_STRING</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;sqlite:///</span><span class="si">{</span><span class="n">HOME_DIR</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">DB_FILE</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="n">OUTPUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;OutputDir&quot;</span><span class="p">,</span> <span class="s2">&quot;tele-bookmarks&quot;</span><span class="p">,</span> <span class="s2">&quot;web-to-pdf&quot;</span><span class="p">)</span>
 <span class="n">BOOKMARKS_TABLE</span> <span class="o">=</span> <span class="s2">&quot;bookmarks&quot;</span>
 
 <span class="n">db</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DB_CONNECTION_STRING</span><span class="p">)</span>
@@ -191,6 +192,7 @@
             <span class="s2">&quot;note&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">,</span>
             <span class="s2">&quot;created_at&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
             <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">archived_entry</span><span class="p">,</span>
+            <span class="s2">&quot;remote_file_id&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="n">bookmarks_table</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">entry_row</span><span class="p">)</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Updated database: </span><span class="si">{</span><span class="n">entry_row</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
