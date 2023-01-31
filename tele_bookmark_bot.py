@@ -7,24 +7,17 @@ import logging
 import os
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 from urllib.parse import urlparse
 
 import dataset
 import telegram
 from dotenv import load_dotenv
-from py_executable_checklist.workflow import run_command
-from slug import slug
 from telegram import Update
 from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
 
 import img_2_txt
-from common_utils import (
-    fetch_html_page,
-    html_parser_from,
-    retry,
-    setup_logging,
-    verified_chat_id,
-)
+from common_utils import retry, setup_logging, verified_chat_id
 from twitter_api import get_tweet
 from yt_api import video_title
 
@@ -63,16 +56,6 @@ def help_command(update: Update, _):
         update.message.reply_text("Help!")
 
 
-def handle_web_page(web_page_url: str) -> str:
-    page_html = fetch_html_page(web_page_url)
-    bs = html_parser_from(page_html)
-    web_page_title = slug(bs.title.string if bs.title and bs.title.string else web_page_url)
-    target_file = OUTPUT_DIR / f"{web_page_title}.pdf"
-    cmd = f'./webpage_to_pdf.py -i "{web_page_url}" -o "{target_file}" --headless'
-    run_command(cmd)
-    return target_file.as_posix()
-
-
 def update_user(bot, chat_id, original_message_id, reply_message_id, incoming_text):
     bot.delete_message(chat_id, original_message_id)
     bot.delete_message(chat_id, reply_message_id)
@@ -86,11 +69,11 @@ class BaseHandler:
     def _find_existing_bookmark(self):
         return bookmarks_table.find_one(note=self.note)
 
-    def bookmark(self) -> str:
+    def bookmark(self) -> Optional[str]:
         existing_bookmark = self._find_existing_bookmark()
         if existing_bookmark:
             logging.info(f"Found one already bookmarked: {existing_bookmark}")
-            return existing_bookmark.get("content")
+            return
 
         archived_entry = self._bookmark()
         entry_row = {
@@ -122,9 +105,9 @@ class Twitter(BaseHandler):
 
 
 class WebPage(BaseHandler):
-    def _bookmark(self) -> str:
+    def _bookmark(self) -> None:
         logging.info(f"Bookmarking WebPage: {self.note}")
-        return handle_web_page(self.note)
+        return None
 
 
 class PlainTextNote(BaseHandler):

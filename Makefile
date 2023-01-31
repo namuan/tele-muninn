@@ -47,6 +47,7 @@ deploy: clean ## Copies any changed file to the server
 		img_2_txt.py \
 		tele-social-vdo.py \
 		muninn-storage.py \
+		muninn-web-page-downloader.py \
 		${PROJECTNAME}:./${PROJECTNAME}
 
 start: deploy ## Sets up a screen session on the server and start the app
