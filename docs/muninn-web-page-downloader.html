@@ -24,13 +24,13 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">ArgumentParser</span><span class="p">,</span> <span class="n">RawDescriptionHelpFormatter</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">dataset</span>
 <span class="kn">import</span> <span class="nn">schedule</span>
-<span class="kn">from</span> <span class="nn">dataset.table</span> <span class="kn">import</span> <span class="n">Table</span>
 <span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
 <span class="kn">from</span> <span class="nn">py_executable_checklist.workflow</span> <span class="kn">import</span> <span class="n">WorkflowBase</span><span class="p">,</span> <span class="n">run_command</span><span class="p">,</span> <span class="n">run_workflow</span>
 <span class="kn">from</span> <span class="nn">slug</span> <span class="kn">import</span> <span class="n">slug</span>
@@ -51,7 +51,16 @@
       <p>Connect to database</p>
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span class="k">class</span> <span class="nc">ConnectToDatabase</span><span class="p">(</span><span class="n">WorkflowBase</span><span class="p">):</span></pre></div>
+      <div class="highlight"><pre><span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">table_from</span><span class="p">(</span><span class="n">database_file_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+    <span class="n">db_connection_string</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;sqlite:///</span><span class="si">{</span><span class="n">database_file_path</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">db_connection_string</span><span class="p">)</span>
+    <span class="n">bookmarks_table</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="s2">&quot;bookmarks&quot;</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="n">bookmarks_table</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<span class="k">class</span> <span class="nc">ConnectToDatabase</span><span class="p">(</span><span class="n">WorkflowBase</span><span class="p">):</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -104,7 +113,7 @@
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre>    <span class="n">db_table</span><span class="p">:</span> <span class="n">Table</span></pre></div>
+      <div class="highlight"><pre>    <span class="n">database_file_path</span><span class="p">:</span> <span class="n">Path</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -117,9 +126,11 @@
     </div>
     <div class='code'>
       <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Selecting next batch of files to download from </span><span class="si">%s</span><span class="s2"> table&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_table</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-        <span class="n">web_pages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_table</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s2">&quot;WebPage&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_limit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">bookmarked_urls</span> <span class="o">=</span> <span class="p">{</span><span class="n">web_page</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]:</span> <span class="n">web_page</span><span class="p">[</span><span class="s2">&quot;note&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">web_page</span> <span class="ow">in</span> <span class="n">web_pages</span><span class="p">}</span>
+        <span class="k">with</span> <span class="n">table_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">database_file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">db_table</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Selecting next batch of files to download from </span><span class="si">%s</span><span class="s2"> table&quot;</span><span class="p">,</span> <span class="n">db_table</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">web_pages</span> <span class="o">=</span> <span class="n">db_table</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s2">&quot;WebPage&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_limit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">bookmarked_urls</span> <span class="o">=</span> <span class="p">{</span><span class="n">web_page</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]:</span> <span class="n">web_page</span><span class="p">[</span><span class="s2">&quot;note&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">web_page</span> <span class="ow">in</span> <span class="n">web_pages</span><span class="p">}</span>
+
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;bookmarked_urls&quot;</span><span class="p">:</span> <span class="n">bookmarked_urls</span><span class="p">}</span></pre></div>
     </div>
   </div>
@@ -145,7 +156,7 @@
     </div>
     <div class='code'>
       <div class="highlight"><pre>    <span class="n">bookmarked_urls</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
-    <span class="n">db_table</span><span class="p">:</span> <span class="n">Table</span></pre></div>
+    <span class="n">database_file_path</span><span class="p">:</span> <span class="n">Path</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -162,6 +173,10 @@
         <span class="n">bs</span> <span class="o">=</span> <span class="n">html_parser_from</span><span class="p">(</span><span class="n">page_html</span><span class="p">)</span>
         <span class="n">web_page_title</span> <span class="o">=</span> <span class="n">slug</span><span class="p">(</span><span class="n">bs</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">string</span> <span class="k">if</span> <span class="n">bs</span><span class="o">.</span><span class="n">title</span> <span class="ow">and</span> <span class="n">bs</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">string</span> <span class="k">else</span> <span class="n">web_page_url</span><span class="p">)</span>
         <span class="n">target_file</span> <span class="o">=</span> <span class="n">OUTPUT_DIR</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">web_page_title</span><span class="si">}</span><span class="s2">.pdf&quot;</span>
+        <span class="k">if</span> <span class="n">target_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;File </span><span class="si">%s</span><span class="s2"> already exists, skipping&quot;</span><span class="p">,</span> <span class="n">target_file</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">target_file</span>
+
         <span class="n">cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;./webpage_to_pdf.py -i &quot;</span><span class="si">{</span><span class="n">web_page_url</span><span class="si">}</span><span class="s1">&quot; -o &quot;</span><span class="si">{</span><span class="n">target_file</span><span class="si">}</span><span class="s1">&quot; --headless&#39;</span>
         <span class="n">run_command</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">target_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
@@ -186,7 +201,8 @@
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloading </span><span class="si">{</span><span class="n">webpage_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">downloaded_file_path_or_error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_web_page</span><span class="p">(</span><span class="n">webpage_url</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Updating database with local id </span><span class="si">{</span><span class="n">db_id</span><span class="si">}</span><span class="s2"> -&gt; download file: </span><span class="si">{</span><span class="n">downloaded_file_path_or_error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">db_table</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">db_id</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">downloaded_file_path_or_error</span><span class="p">},</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span></pre></div>
+            <span class="k">with</span> <span class="n">table_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">database_file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">db_table</span><span class="p">:</span>
+                <span class="n">db_table</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">db_id</span><span class="p">),</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">downloaded_file_path_or_error</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()},</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -200,7 +216,6 @@
     <div class='code'>
       <div class="highlight"><pre><span class="k">def</span> <span class="nf">workflow</span><span class="p">():</span>
     <span class="k">return</span> <span class="p">[</span>
-        <span class="n">ConnectToDatabase</span><span class="p">,</span>
         <span class="n">SelectPendingBookmarksToDownload</span><span class="p">,</span>
         <span class="n">DownloadWebPages</span><span class="p">,</span>
     <span class="p">]</span></pre></div>

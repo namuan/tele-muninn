@@ -6,13 +6,13 @@ import functools
 import logging
 import time
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Union
 
 import dataset
 import schedule
-from dataset.table import Table
 from dotenv import load_dotenv
 from py_executable_checklist.workflow import WorkflowBase, run_command, run_workflow
 from slug import slug
@@ -22,6 +22,15 @@ from common_utils import fetch_html_page, html_parser_from, setup_logging
 load_dotenv()
 
 OUTPUT_DIR = Path.home().joinpath("OutputDir", "tele-bookmarks", "web-to-pdf")
+
+
+@contextmanager
+def table_from(database_file_path: Path):
+    db_connection_string = f"sqlite:///{database_file_path.as_posix()}"
+    db = dataset.connect(db_connection_string)
+    bookmarks_table = db.create_table("bookmarks")
+    yield bookmarks_table
+    db.close()
 
 
 class ConnectToDatabase(WorkflowBase):
@@ -44,12 +53,14 @@ class SelectPendingBookmarksToDownload(WorkflowBase):
     Select next batch of bookmarks to download
     """
 
-    db_table: Table
+    database_file_path: Path
 
     def execute(self) -> dict:
-        logging.info("Selecting next batch of files to download from %s table", self.db_table.name)
-        web_pages = self.db_table.find(source="WebPage", content=None, _limit=1)
-        bookmarked_urls = {web_page["id"]: web_page["note"] for web_page in web_pages}
+        with table_from(self.database_file_path) as db_table:
+            logging.info("Selecting next batch of files to download from %s table", db_table.name)
+            web_pages = db_table.find(source="WebPage", content=None, _limit=1)
+            bookmarked_urls = {web_page["id"]: web_page["note"] for web_page in web_pages}
+
         return {"bookmarked_urls": bookmarked_urls}
 
 
@@ -59,13 +70,17 @@ class DownloadWebPages(WorkflowBase):
     """
 
     bookmarked_urls: Dict[str, str]
-    db_table: Table
+    database_file_path: Path
 
     def handle_web_page(self, web_page_url: str) -> Union[Path, str]:
         page_html = fetch_html_page(web_page_url)
         bs = html_parser_from(page_html)
         web_page_title = slug(bs.title.string if bs.title and bs.title.string else web_page_url)
         target_file = OUTPUT_DIR / f"{web_page_title}.pdf"
+        if target_file.exists():
+            logging.info("File %s already exists, skipping", target_file)
+            return target_file
+
         cmd = f'./webpage_to_pdf.py -i "{web_page_url}" -o "{target_file}" --headless'
         run_command(cmd)
         if target_file.exists():
@@ -80,12 +95,12 @@ class DownloadWebPages(WorkflowBase):
             print(f"Downloading {webpage_url}")
             downloaded_file_path_or_error = self.handle_web_page(webpage_url)
             print(f"Updating database with local id {db_id} -> download file: {downloaded_file_path_or_error}")
-            self.db_table.update({"id": db_id, "content": downloaded_file_path_or_error}, ["id"])
+            with table_from(self.database_file_path) as db_table:
+                db_table.update({"id": str(db_id), "content": downloaded_file_path_or_error.as_posix()}, ["id"])
 
 
 def workflow():
     return [
-        ConnectToDatabase,
         SelectPendingBookmarksToDownload,
         DownloadWebPages,
     ]
