@@ -7,13 +7,13 @@ import logging
 import os
 import time
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict
 
 import dataset
 import schedule
-from dataset.table import Table
 from dotenv import load_dotenv
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -34,19 +34,13 @@ SCOPES = [
 logging.getLogger("googleapiclient.discovery_cache").setLevel(logging.ERROR)
 
 
-class ConnectToDatabase(WorkflowBase):
-    """
-    Connect to database
-    """
-
-    database_file_path: Path
-
-    def execute(self) -> dict:
-        db_connection_string = f"sqlite:///{self.database_file_path.as_posix()}"
-        db = dataset.connect(db_connection_string)
-        bookmarks_table = db.create_table("bookmarks")
-
-        return {"db_table": bookmarks_table}
+@contextmanager
+def table_from(database_file_path: Path):
+    db_connection_string = f"sqlite:///{database_file_path.as_posix()}"
+    db = dataset.connect(db_connection_string)
+    bookmarks_table = db.create_table("bookmarks")
+    yield bookmarks_table
+    db.close()
 
 
 class ReadTokenFromFile(WorkflowBase):
@@ -83,12 +77,14 @@ class SelectPendingBookmarksToUpload(WorkflowBase):
     Select next batch of files to upload from database
     """
 
-    db_table: Table
+    database_file_path: Path
 
     def execute(self) -> dict:
-        logging.info("Selecting next batch of files to upload from %s table", self.db_table.name)
-        web_pages = self.db_table.find(source="WebPage", remote_file_id=None, _limit=5)
-        local_archived_files = {web_page["id"]: Path(web_page["content"]) for web_page in web_pages}
+        with table_from(self.database_file_path) as db_table:
+            logging.info("Selecting next batch of files to upload from %s table", db_table.name)
+            web_pages = db_table.find(source="WebPage", content={"!=": "Not downloaded"}, remote_file_id=None, _limit=5)
+            local_archived_files = {web_page["id"]: Path(web_page["content"]) for web_page in web_pages}
+
         return {"local_files": local_archived_files}
 
 
@@ -99,23 +95,27 @@ class UploadWebPagesToGDrive(WorkflowBase):
 
     google_service: Any
     local_files: Dict[str, Path]
-    db_table: Table
+    database_file_path: Path
 
     def execute(self):
-        logging.info("Uploading web pages to GDrive")
+        logging.info("Uploading %s web pages to GDrive", len(self.local_files))
         for db_id, local_file in self.local_files.items():
-            print(f"Uploading {local_file}")
+            logging.info("Uploading %s to GDrive", local_file)
             file_metadata = {"name": local_file.stem, "parents": [GDRIVE_REMOTE_FOLDER_ID]}
-            media = MediaFileUpload(local_file.as_posix(), mimetype="application/pdf")
-            file = self.google_service.files().create(body=file_metadata, media_body=media, fields="id").execute()
-            uploaded_file_id = file.get("id")
-            print(f"Updating database with local id {db_id} -> remote file id: {uploaded_file_id}")
-            self.db_table.update({"id": db_id, "remote_file_id": uploaded_file_id}, ["id"])
+            try:
+                media = MediaFileUpload(local_file.as_posix(), mimetype="application/pdf")
+                file = self.google_service.files().create(body=file_metadata, media_body=media, fields="id").execute()
+                uploaded_file_id = file.get("id")
+                print(f"Updating database with local id {db_id} -> remote file id: {uploaded_file_id}")
+                with table_from(self.database_file_path) as db_table:
+                    db_table.update({"id": db_id, "remote_file_id": uploaded_file_id}, ["id"])
+            except FileNotFoundError as e:
+                logging.error("File Id: %s -> File not found: %s", db_id, local_file)
+                raise e
 
 
 def workflow():
     return [
-        ConnectToDatabase,
         ReadTokenFromFile,
         RefreshTokenIfExpired,
         SelectPendingBookmarksToUpload,
@@ -148,8 +148,8 @@ def run_on_schedule(context):
 
 
 def main(context):
+    run_workflow(context, workflow())
     if context["batch"]:
-        run_workflow(context, workflow())
         return
 
     print(f"Checking at: {datetime.now()}")
