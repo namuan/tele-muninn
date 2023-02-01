@@ -33,21 +33,6 @@ def table_from(database_file_path: Path):
     db.close()
 
 
-class ConnectToDatabase(WorkflowBase):
-    """
-    Connect to database
-    """
-
-    database_file_path: Path
-
-    def execute(self) -> dict:
-        db_connection_string = f"sqlite:///{self.database_file_path.as_posix()}"
-        db = dataset.connect(db_connection_string)
-        bookmarks_table = db.create_table("bookmarks")
-
-        return {"db_table": bookmarks_table}
-
-
 class SelectPendingBookmarksToDownload(WorkflowBase):
     """
     Select next batch of bookmarks to download

@@ -48,7 +48,7 @@
       <div class='octowrap'>
         <a class='octothorpe' href='#section-1'>#</a>
       </div>
-      <p>Connect to database</p>
+      <p>Select next batch of bookmarks to download</p>
     </div>
     <div class='code'>
       <div class="highlight"><pre><span class="nd">@contextmanager</span>
@@ -60,7 +60,7 @@
     <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
 
-<span class="k">class</span> <span class="nc">ConnectToDatabase</span><span class="p">(</span><span class="n">WorkflowBase</span><span class="p">):</span></pre></div>
+<span class="k">class</span> <span class="nc">SelectPendingBookmarksToDownload</span><span class="p">(</span><span class="n">WorkflowBase</span><span class="p">):</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -85,11 +85,12 @@
     </div>
     <div class='code'>
       <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-        <span class="n">db_connection_string</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;sqlite:///</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">database_file_path</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="n">db</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">db_connection_string</span><span class="p">)</span>
-        <span class="n">bookmarks_table</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="s2">&quot;bookmarks&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">table_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">database_file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">db_table</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Selecting next batch of files to download from </span><span class="si">%s</span><span class="s2"> table&quot;</span><span class="p">,</span> <span class="n">db_table</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">web_pages</span> <span class="o">=</span> <span class="n">db_table</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s2">&quot;WebPage&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_limit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">bookmarked_urls</span> <span class="o">=</span> <span class="p">{</span><span class="n">web_page</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]:</span> <span class="n">web_page</span><span class="p">[</span><span class="s2">&quot;note&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">web_page</span> <span class="ow">in</span> <span class="n">web_pages</span><span class="p">}</span>
 
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;db_table&quot;</span><span class="p">:</span> <span class="n">bookmarks_table</span><span class="p">}</span></pre></div>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;bookmarked_urls&quot;</span><span class="p">:</span> <span class="n">bookmarked_urls</span><span class="p">}</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -98,10 +99,10 @@
       <div class='octowrap'>
         <a class='octothorpe' href='#section-4'>#</a>
       </div>
-      <p>Select next batch of bookmarks to download</p>
+      <p>Download selected web pages to local directory and update database</p>
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span class="k">class</span> <span class="nc">SelectPendingBookmarksToDownload</span><span class="p">(</span><span class="n">WorkflowBase</span><span class="p">):</span></pre></div>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">DownloadWebPages</span><span class="p">(</span><span class="n">WorkflowBase</span><span class="p">):</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -113,7 +114,8 @@
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre>    <span class="n">database_file_path</span><span class="p">:</span> <span class="n">Path</span></pre></div>
+      <div class="highlight"><pre>    <span class="n">bookmarked_urls</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+    <span class="n">database_file_path</span><span class="p">:</span> <span class="n">Path</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -121,49 +123,6 @@
     <div class='docs'>
       <div class='octowrap'>
         <a class='octothorpe' href='#section-6'>#</a>
-      </div>
-      
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-        <span class="k">with</span> <span class="n">table_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">database_file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">db_table</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Selecting next batch of files to download from </span><span class="si">%s</span><span class="s2"> table&quot;</span><span class="p">,</span> <span class="n">db_table</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-            <span class="n">web_pages</span> <span class="o">=</span> <span class="n">db_table</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s2">&quot;WebPage&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_limit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">bookmarked_urls</span> <span class="o">=</span> <span class="p">{</span><span class="n">web_page</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]:</span> <span class="n">web_page</span><span class="p">[</span><span class="s2">&quot;note&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">web_page</span> <span class="ow">in</span> <span class="n">web_pages</span><span class="p">}</span>
-
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;bookmarked_urls&quot;</span><span class="p">:</span> <span class="n">bookmarked_urls</span><span class="p">}</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-7'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-7'>#</a>
-      </div>
-      <p>Download selected web pages to local directory and update database</p>
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre><span class="k">class</span> <span class="nc">DownloadWebPages</span><span class="p">(</span><span class="n">WorkflowBase</span><span class="p">):</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-8'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-8'>#</a>
-      </div>
-      
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre>    <span class="n">bookmarked_urls</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
-    <span class="n">database_file_path</span><span class="p">:</span> <span class="n">Path</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-9'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-9'>#</a>
       </div>
       
     </div>
@@ -187,10 +146,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-10'>
+  <div class='section' id='section-7'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-10'>#</a>
+        <a class='octothorpe' href='#section-7'>#</a>
       </div>
       
     </div>
@@ -206,10 +165,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-11'>
+  <div class='section' id='section-8'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-11'>#</a>
+        <a class='octothorpe' href='#section-8'>#</a>
       </div>
       
     </div>
@@ -222,10 +181,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-12'>
+  <div class='section' id='section-9'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-12'>#</a>
+        <a class='octothorpe' href='#section-9'>#</a>
       </div>
       
     </div>
@@ -248,10 +207,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-13'>
+  <div class='section' id='section-10'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-13'>#</a>
+        <a class='octothorpe' href='#section-10'>#</a>
       </div>
       
     </div>
@@ -261,10 +220,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-14'>
+  <div class='section' id='section-11'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-14'>#</a>
+        <a class='octothorpe' href='#section-11'>#</a>
       </div>
       
     </div>
