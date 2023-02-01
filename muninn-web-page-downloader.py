@@ -113,8 +113,8 @@ def run_on_schedule(context):
 
 
 def main(context):
+    run_workflow(context, workflow())
     if context["batch"]:
-        run_workflow(context, workflow())
         return
 
     print(f"Checking at: {datetime.now()}")
