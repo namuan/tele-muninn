@@ -8,25 +8,21 @@ Usage:
 """
 
 import argparse
-import functools
 import logging
 import os
-import time
 from argparse import ArgumentParser
-from datetime import datetime
 from typing import List
 
 import dataset
-import schedule
 from dataset import Table
 from dotenv import load_dotenv
-from py_executable_checklist.workflow import WorkflowBase, run_workflow
+from py_executable_checklist.workflow import WorkflowBase
 
 from common_utils import (
     fetch_html_page,
     html_parser_from,
     send_message_to_telegram,
-    setup_logging,
+    setup_logging, run_in_background,
 )
 
 # Common functions across steps
@@ -156,9 +152,6 @@ class SetupDatabase(WorkflowBase):
         return {"db_table": db.create_table(table_name)}
 
 
-# Workflow definition
-
-
 def workflow():
     return [
         SetupDatabase,
@@ -171,36 +164,25 @@ def workflow():
     ]
 
 
-# Boilerplate
-
-
 def parse_args():
     parser = ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument(
+        "-b", "--batch", action="store_true", default=False, help="Run in batch mode (no scheduling, just run once)"
+    )
+    parser.add_argument(
         "-v",
         "--verbose",
-        action="store_true",
-        default=False,
+        action="count",
+        default=0,
         dest="verbose",
-        help="Display context variables at each step",
+        help="Increase verbosity of logging output. Display context variables between each step run",
     )
     return parser.parse_args()
 
 
-def run_on_schedule(context):
-    run_workflow(context, workflow())
-
-
-def main(context):
-    print(f"Running {datetime.now()}")
-    schedule.every(15).minutes.do(functools.partial(run_on_schedule, context))
-    while True:
-        schedule.run_pending()
-        time.sleep(10 * 60)
-
-
 if __name__ == "__main__":
+    print("Running HN GitHub Repos")
     args = parse_args()
     setup_logging(args.verbose)
-    main(args.__dict__)
-    # run_on_schedule(args.__dict__)
+    context = args.__dict__
+    run_in_background(context, workflow())
