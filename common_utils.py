@@ -8,9 +8,11 @@ import shutil
 import string
 import time
 import uuid
+from contextlib import contextmanager
 from functools import wraps
 from pathlib import Path
 
+import dataset
 import requests
 from bs4 import BeautifulSoup
 from rich.logging import RichHandler
@@ -191,6 +193,15 @@ def verified_chat_id(chat_id):
             f"🚫 Chat ID {chat_id} is not authorized. Authorized Chat Id: {auth_chat_id} or {personal_chat_id}"
         )
         return False
+
+
+@contextmanager
+def table_from(database_file_path: Path):
+    db_connection_string = f"sqlite:///{database_file_path.as_posix()}"
+    db = dataset.connect(db_connection_string)
+    bookmarks_table = db.create_table("bookmarks")
+    yield bookmarks_table
+    db.close()
 
 
 if __name__ == "__main__":

@@ -15,6 +15,20 @@ Collection of Telegram bots
 ### Scripts
 
 <!-- START makefile-doc -->
+[_muninn-photo-ocr.py_](https://namuan.github.io/tele-muninn/muninn-photo-ocr.html)
+```
+Running Muninn-OCR
+usage: muninn-photo-ocr.py [-h] -d DATABASE_FILE_PATH [-b] [-v]
+
+options:
+  -h, --help            show this help message and exit
+  -d DATABASE_FILE_PATH, --database-file-path DATABASE_FILE_PATH
+                        Path to database file
+  -b, --batch           Run in batch mode (no scheduling, just run once)
+  -v, --verbose         Increase verbosity of logging output. Display context
+                        variables between each step run
+
+```
 [_tele-social-vdo.py_](https://namuan.github.io/tele-muninn/tele-social-vdo.html)
 ```
 usage: tele-social-vdo.py [-h] [-i INPUT_URL] [-b] [-v]
@@ -72,7 +86,6 @@ options:
 ```
 [_muninn-web-page-downloader.py_](https://namuan.github.io/tele-muninn/muninn-web-page-downloader.html)
 ```
-Running Muninn-WebPage-Downloader
 usage: muninn-web-page-downloader.py [-h] -d DATABASE_FILE_PATH [-b] [-v]
 
 Download web page using puppeteer and save it to local file system

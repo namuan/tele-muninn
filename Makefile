@@ -44,8 +44,8 @@ deploy: clean ## Copies any changed file to the server
 		tele_web_links.py \
 		openai_api.py \
 		tele_openai_bot.py \
-		img_2_txt.py \
 		tele-social-vdo.py \
+		muninn-photo-ocr.py \
 		muninn-storage.py \
 		muninn-web-page-downloader.py \
 		${PROJECTNAME}:./${PROJECTNAME}

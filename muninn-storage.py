@@ -7,12 +7,10 @@ import logging
 import os
 import time
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
-from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict
 
-import dataset
 import schedule
 from dotenv import load_dotenv
 from google.auth.transport.requests import Request
@@ -21,7 +19,8 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from py_executable_checklist.workflow import WorkflowBase, run_workflow
 
-from common_utils import setup_logging
+from common_utils import setup_logging, table_from
+from tele_bookmark_bot import WebPage
 
 load_dotenv()
 
@@ -32,15 +31,6 @@ SCOPES = [
 ]
 
 logging.getLogger("googleapiclient.discovery_cache").setLevel(logging.ERROR)
-
-
-@contextmanager
-def table_from(database_file_path: Path):
-    db_connection_string = f"sqlite:///{database_file_path.as_posix()}"
-    db = dataset.connect(db_connection_string)
-    bookmarks_table = db.create_table("bookmarks")
-    yield bookmarks_table
-    db.close()
 
 
 class ReadTokenFromFile(WorkflowBase):
@@ -82,7 +72,7 @@ class SelectPendingBookmarksToUpload(WorkflowBase):
     def execute(self) -> dict:
         with table_from(self.database_file_path) as db_table:
             logging.info("Selecting next batch of files to upload from %s table", db_table.name)
-            web_pages = db_table.find(source="WebPage", content={"!=": "Not downloaded"}, remote_file_id=None)
+            web_pages = db_table.find(source=WebPage.__name__, content={"!=": "Not downloaded"}, remote_file_id=None)
             local_archived_files = {web_page["id"]: Path(web_page["content"]) for web_page in web_pages}
 
         return {"local_files": local_archived_files}
