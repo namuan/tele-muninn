@@ -1,4 +1,5 @@
 import base64
+import functools
 import json
 import logging
 import os
@@ -9,12 +10,16 @@ import string
 import time
 import uuid
 from contextlib import contextmanager
+from datetime import datetime
 from functools import wraps
 from pathlib import Path
+from typing import Dict, List, Type
 
 import dataset
 import requests
+import schedule
 from bs4 import BeautifulSoup
+from py_executable_checklist.workflow import WorkflowBase, run_workflow
 from rich.logging import RichHandler
 
 
@@ -202,6 +207,23 @@ def table_from(database_file_path: Path):
     bookmarks_table = db.create_table("bookmarks")
     yield bookmarks_table
     db.close()
+
+
+def run_on_schedule(context, workflow):
+    run_workflow(context, workflow)
+
+
+def run_in_background(context: Dict, workflow: List[Type[WorkflowBase]]):
+    run_workflow(context, workflow)
+    if context["batch"]:
+        return
+
+    logging.info(f"Checking at: {datetime.now()}")
+    repeat_in_mins = context.get("repeat_in_mins", 10)
+    schedule.every(repeat_in_mins).minutes.do(functools.partial(run_on_schedule, context, workflow))
+    while True:
+        schedule.run_pending()
+        time.sleep(10 * 60)
 
 
 if __name__ == "__main__":

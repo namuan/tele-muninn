@@ -1,18 +1,20 @@
-import functools
 import logging
 import os
-import time
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
-from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
 
-import schedule
 import telegram
 from dotenv import load_dotenv
-from py_executable_checklist.workflow import WorkflowBase, run_command, run_workflow
+from py_executable_checklist.workflow import WorkflowBase, run_command
 
-from common_utils import retry, send_message_to_telegram, setup_logging, table_from
+from common_utils import (
+    retry,
+    run_in_background,
+    send_message_to_telegram,
+    setup_logging,
+    table_from,
+)
 from tele_bookmark_bot import PhotoOcr
 
 # Common functions across steps
@@ -105,25 +107,9 @@ def parse_args():
     return parser.parse_args()
 
 
-def run_on_schedule(context):
-    run_workflow(context, workflow())
-
-
-def main(context):
-    run_workflow(context, workflow())
-    if context["batch"]:
-        return
-
-    print(f"Checking at: {datetime.now()}")
-    schedule.every(10).minutes.do(functools.partial(run_on_schedule, context))
-    while True:
-        schedule.run_pending()
-        time.sleep(10 * 60)
-
-
 if __name__ == "__main__":
     print("Running Muninn-OCR")
     args = parse_args()
     setup_logging(args.verbose)
     context = args.__dict__
-    main(context)
+    run_in_background(context, workflow())

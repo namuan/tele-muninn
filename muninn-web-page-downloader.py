@@ -2,20 +2,22 @@
 """
 Download web page using puppeteer and save it to local file system
 """
-import functools
 import logging
-import time
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
-from datetime import datetime
 from pathlib import Path
-from typing import Dict, Union
+from typing import Dict, List, Type, Union
 
-import schedule
 from dotenv import load_dotenv
-from py_executable_checklist.workflow import WorkflowBase, run_command, run_workflow
+from py_executable_checklist.workflow import WorkflowBase, run_command
 from slug import slug
 
-from common_utils import fetch_html_page, html_parser_from, setup_logging, table_from
+from common_utils import (
+    fetch_html_page,
+    html_parser_from,
+    run_in_background,
+    setup_logging,
+    table_from,
+)
 from tele_bookmark_bot import WebPage
 
 load_dotenv()
@@ -80,7 +82,7 @@ class DownloadWebPages(WorkflowBase):
                 db_table.update({"id": str(db_id), "content": self.content_from(downloaded_file_path_or_error)}, ["id"])
 
 
-def workflow():
+def workflow() -> List[Type[WorkflowBase]]:
     return [
         SelectPendingBookmarksToDownload,
         DownloadWebPages,
@@ -104,25 +106,9 @@ def parse_args():
     return parser.parse_args()
 
 
-def run_on_schedule(context):
-    run_workflow(context, workflow())
-
-
-def main(context):
-    run_workflow(context, workflow())
-    if context["batch"]:
-        return
-
-    logging.info(f"Checking at: {datetime.now()}")
-    schedule.every(10).minutes.do(functools.partial(run_on_schedule, context))
-    while True:
-        schedule.run_pending()
-        time.sleep(10 * 60)
-
-
 if __name__ == "__main__":
     logging.info("Running Muninn-WebPage-Downloader")
     args = parse_args()
     setup_logging(args.verbose)
     context = args.__dict__
-    main(context)
+    run_in_background(context, workflow())

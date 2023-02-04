@@ -2,24 +2,20 @@
 """
 Copy local files to GDrive remote storage
 """
-import functools
 import logging
 import os
-import time
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
-from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict
 
-import schedule
 from dotenv import load_dotenv
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
-from py_executable_checklist.workflow import WorkflowBase, run_workflow
+from py_executable_checklist.workflow import WorkflowBase
 
-from common_utils import setup_logging, table_from
+from common_utils import run_in_background, setup_logging, table_from
 from tele_bookmark_bot import WebPage
 
 load_dotenv()
@@ -133,25 +129,9 @@ def parse_args():
     return parser.parse_args()
 
 
-def run_on_schedule(context):
-    run_workflow(context, workflow())
-
-
-def main(context):
-    run_workflow(context, workflow())
-    if context["batch"]:
-        return
-
-    print(f"Checking at: {datetime.now()}")
-    schedule.every(10).minutes.do(functools.partial(run_on_schedule, context))
-    while True:
-        schedule.run_pending()
-        time.sleep(10 * 60)
-
-
 if __name__ == "__main__":
     print("Running Muninn-Storage")
     args = parse_args()
     setup_logging(args.verbose)
     context = args.__dict__
-    main(context)
+    run_in_background(context, workflow())
