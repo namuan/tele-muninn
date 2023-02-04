@@ -16,7 +16,6 @@ from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
 
-import img_2_txt
 from common_utils import retry, setup_logging, verified_chat_id
 from twitter_api import get_tweet
 from yt_api import video_title
@@ -73,7 +72,7 @@ class BaseHandler:
         existing_bookmark = self._find_existing_bookmark()
         if existing_bookmark:
             logging.info(f"Found one already bookmarked: {existing_bookmark}")
-            return
+            return existing_bookmark["content"]
 
         archived_entry = self._bookmark()
         entry_row = {
@@ -127,6 +126,10 @@ class Photo(BaseHandler):
         return target_file.as_posix()
 
 
+class PhotoOcr(Photo):
+    pass
+
+
 class Document(BaseHandler):
     def __init__(self, note, document_file):
         super().__init__(note)
@@ -166,13 +169,13 @@ def process_photo(update: Update) -> str:
     photo_file = update.message.photo[-1].get_file()
 
     photo_identifier = update_message_text or original_message_id
-    photo_handler = Photo(photo_identifier, photo_file)
-    photo_file_path = photo_handler.bookmark()
-
     update_message_caption = stripped_caption(update)
     if update_message_caption == "ocr":
-        converted_text = img_2_txt.main(photo_file_path)
-        update.message.reply_text(converted_text)
+        photo_handler = PhotoOcr(photo_identifier, photo_file)
+    else:
+        photo_handler = Photo(photo_identifier, photo_file)
+
+    photo_handler.bookmark()
 
     return f"Photo {photo_identifier}"
 
@@ -213,7 +216,7 @@ def adapter(update: Update, context):
 
         reply_message = bot.send_message(
             chat_id,
-            f"Got {update_message_text}. 👀 at 🌎",
+            f"Got {update_message_text if update_message_text else 'it'}. 👀 at 🌎",
             disable_web_page_preview=True,
         )
 

@@ -34,7 +34,6 @@
 <span class="kn">from</span> <span class="nn">telegram</span> <span class="kn">import</span> <span class="n">Update</span>
 <span class="kn">from</span> <span class="nn">telegram.ext</span> <span class="kn">import</span> <span class="n">CommandHandler</span><span class="p">,</span> <span class="n">Filters</span><span class="p">,</span> <span class="n">MessageHandler</span><span class="p">,</span> <span class="n">Updater</span>
 
-<span class="kn">import</span> <span class="nn">img_2_txt</span>
 <span class="kn">from</span> <span class="nn">common_utils</span> <span class="kn">import</span> <span class="n">retry</span><span class="p">,</span> <span class="n">setup_logging</span><span class="p">,</span> <span class="n">verified_chat_id</span>
 <span class="kn">from</span> <span class="nn">twitter_api</span> <span class="kn">import</span> <span class="n">get_tweet</span>
 <span class="kn">from</span> <span class="nn">yt_api</span> <span class="kn">import</span> <span class="n">video_title</span>
@@ -158,7 +157,7 @@
         <span class="n">existing_bookmark</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_existing_bookmark</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">existing_bookmark</span><span class="p">:</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found one already bookmarked: </span><span class="si">{</span><span class="n">existing_bookmark</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">return</span>
+            <span class="k">return</span> <span class="n">existing_bookmark</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">]</span>
 
         <span class="n">archived_entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bookmark</span><span class="p">()</span>
         <span class="n">entry_row</span> <span class="o">=</span> <span class="p">{</span>
@@ -341,7 +340,8 @@
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span class="k">class</span> <span class="nc">Document</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span></pre></div>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">PhotoOcr</span><span class="p">(</span><span class="n">Photo</span><span class="p">):</span>
+    <span class="k">pass</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -353,9 +353,7 @@
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">note</span><span class="p">,</span> <span class="n">document_file</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">note</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">document_file</span> <span class="o">=</span> <span class="n">document_file</span></pre></div>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">Document</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -363,6 +361,20 @@
     <div class='docs'>
       <div class='octowrap'>
         <a class='octothorpe' href='#section-22'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">note</span><span class="p">,</span> <span class="n">document_file</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">note</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">document_file</span> <span class="o">=</span> <span class="n">document_file</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-23'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-23'>#</a>
       </div>
       
     </div>
@@ -375,10 +387,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-23'>
+  <div class='section' id='section-24'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-23'>#</a>
+        <a class='octothorpe' href='#section-24'>#</a>
       </div>
       
     </div>
@@ -404,10 +416,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-24'>
+  <div class='section' id='section-25'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-24'>#</a>
+        <a class='octothorpe' href='#section-25'>#</a>
       </div>
       
     </div>
@@ -419,22 +431,22 @@
     <span class="n">photo_file</span> <span class="o">=</span> <span class="n">update</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">photo</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_file</span><span class="p">()</span>
 
     <span class="n">photo_identifier</span> <span class="o">=</span> <span class="n">update_message_text</span> <span class="ow">or</span> <span class="n">original_message_id</span>
-    <span class="n">photo_handler</span> <span class="o">=</span> <span class="n">Photo</span><span class="p">(</span><span class="n">photo_identifier</span><span class="p">,</span> <span class="n">photo_file</span><span class="p">)</span>
-    <span class="n">photo_file_path</span> <span class="o">=</span> <span class="n">photo_handler</span><span class="o">.</span><span class="n">bookmark</span><span class="p">()</span>
-
     <span class="n">update_message_caption</span> <span class="o">=</span> <span class="n">stripped_caption</span><span class="p">(</span><span class="n">update</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">update_message_caption</span> <span class="o">==</span> <span class="s2">&quot;ocr&quot;</span><span class="p">:</span>
-        <span class="n">converted_text</span> <span class="o">=</span> <span class="n">img_2_txt</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">photo_file_path</span><span class="p">)</span>
-        <span class="n">update</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">reply_text</span><span class="p">(</span><span class="n">converted_text</span><span class="p">)</span>
+        <span class="n">photo_handler</span> <span class="o">=</span> <span class="n">PhotoOcr</span><span class="p">(</span><span class="n">photo_identifier</span><span class="p">,</span> <span class="n">photo_file</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">photo_handler</span> <span class="o">=</span> <span class="n">Photo</span><span class="p">(</span><span class="n">photo_identifier</span><span class="p">,</span> <span class="n">photo_file</span><span class="p">)</span>
+
+    <span class="n">photo_handler</span><span class="o">.</span><span class="n">bookmark</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Photo </span><span class="si">{</span><span class="n">photo_identifier</span><span class="si">}</span><span class="s2">&quot;</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-25'>
+  <div class='section' id='section-26'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-25'>#</a>
+        <a class='octothorpe' href='#section-26'>#</a>
       </div>
       
     </div>
@@ -447,10 +459,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-26'>
+  <div class='section' id='section-27'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-26'>#</a>
+        <a class='octothorpe' href='#section-27'>#</a>
       </div>
       
     </div>
@@ -462,10 +474,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-27'>
+  <div class='section' id='section-28'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-27'>#</a>
+        <a class='octothorpe' href='#section-28'>#</a>
       </div>
       
     </div>
@@ -479,10 +491,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-28'>
+  <div class='section' id='section-29'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-28'>#</a>
+        <a class='octothorpe' href='#section-29'>#</a>
       </div>
       <p>Start bot and hook callback functions</p>
     </div>
@@ -502,7 +514,7 @@
 
         <span class="n">reply_message</span> <span class="o">=</span> <span class="n">bot</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span>
             <span class="n">chat_id</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">update_message_text</span><span class="si">}</span><span class="s2">. 👀 at 🌎&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">update_message_text</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">update_message_text</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;it&#39;</span><span class="si">}</span><span class="s2">. 👀 at 🌎&quot;</span><span class="p">,</span>
             <span class="n">disable_web_page_preview</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -528,10 +540,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-29'>
+  <div class='section' id='section-30'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-29'>#</a>
+        <a class='octothorpe' href='#section-30'>#</a>
       </div>
       
     </div>
@@ -555,10 +567,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-30'>
+  <div class='section' id='section-31'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-30'>#</a>
+        <a class='octothorpe' href='#section-31'>#</a>
       </div>
       
     </div>
@@ -568,10 +580,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-31'>
+  <div class='section' id='section-32'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-31'>#</a>
+        <a class='octothorpe' href='#section-32'>#</a>
       </div>
       
     </div>
