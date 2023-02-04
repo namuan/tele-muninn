@@ -43,7 +43,7 @@ class SelectPendingBookmarksToDownload(WorkflowBase):
     def execute(self) -> dict:
         with table_from(self.database_file_path) as db_table:
             logging.info("Selecting next batch of files to download from %s table", db_table.name)
-            web_pages = db_table.find(source="WebPage", content=None, _limit=1)
+            web_pages = db_table.find(source="WebPage", content=None)
             bookmarked_urls = {web_page["id"]: web_page["note"] for web_page in web_pages}
 
         return {"bookmarked_urls": bookmarked_urls}

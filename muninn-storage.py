@@ -82,7 +82,7 @@ class SelectPendingBookmarksToUpload(WorkflowBase):
     def execute(self) -> dict:
         with table_from(self.database_file_path) as db_table:
             logging.info("Selecting next batch of files to upload from %s table", db_table.name)
-            web_pages = db_table.find(source="WebPage", content={"!=": "Not downloaded"}, remote_file_id=None, _limit=5)
+            web_pages = db_table.find(source="WebPage", content={"!=": "Not downloaded"}, remote_file_id=None)
             local_archived_files = {web_page["id"]: Path(web_page["content"]) for web_page in web_pages}
 
         return {"local_files": local_archived_files}
@@ -153,7 +153,7 @@ def main(context):
         return
 
     print(f"Checking at: {datetime.now()}")
-    schedule.every(60).minutes.do(functools.partial(run_on_schedule, context))
+    schedule.every(10).minutes.do(functools.partial(run_on_schedule, context))
     while True:
         schedule.run_pending()
         time.sleep(10 * 60)
