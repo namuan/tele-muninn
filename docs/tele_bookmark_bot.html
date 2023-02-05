@@ -273,7 +273,8 @@
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span class="k">class</span> <span class="nc">PlainTextNote</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span></pre></div>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">GitHub</span><span class="p">(</span><span class="n">WebPage</span><span class="p">):</span>
+    <span class="k">pass</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -285,8 +286,7 @@
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">_bookmark</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">note</span></pre></div>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">PlainTextNote</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -298,7 +298,8 @@
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span class="k">class</span> <span class="nc">Photo</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span></pre></div>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">_bookmark</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">note</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -310,9 +311,7 @@
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">note</span><span class="p">,</span> <span class="n">photo_file</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">note</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">photo_file</span> <span class="o">=</span> <span class="n">photo_file</span></pre></div>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">Photo</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -320,6 +319,20 @@
     <div class='docs'>
       <div class='octowrap'>
         <a class='octothorpe' href='#section-19'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">note</span><span class="p">,</span> <span class="n">photo_file</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">note</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo_file</span> <span class="o">=</span> <span class="n">photo_file</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-20'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-20'>#</a>
       </div>
       
     </div>
@@ -332,19 +345,6 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-20'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-20'>#</a>
-      </div>
-      
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre><span class="k">class</span> <span class="nc">PhotoOcr</span><span class="p">(</span><span class="n">Photo</span><span class="p">):</span>
-    <span class="k">pass</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
   <div class='section' id='section-21'>
     <div class='docs'>
       <div class='octowrap'>
@@ -353,7 +353,8 @@
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span class="k">class</span> <span class="nc">Document</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span></pre></div>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">PhotoOcr</span><span class="p">(</span><span class="n">Photo</span><span class="p">):</span>
+    <span class="k">pass</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -365,9 +366,7 @@
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">note</span><span class="p">,</span> <span class="n">document_file</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">note</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">document_file</span> <span class="o">=</span> <span class="n">document_file</span></pre></div>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">Document</span><span class="p">(</span><span class="n">BaseHandler</span><span class="p">):</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -375,6 +374,20 @@
     <div class='docs'>
       <div class='octowrap'>
         <a class='octothorpe' href='#section-23'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">note</span><span class="p">,</span> <span class="n">document_file</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">note</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">document_file</span> <span class="o">=</span> <span class="n">document_file</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-24'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-24'>#</a>
       </div>
       
     </div>
@@ -387,10 +400,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-24'>
+  <div class='section' id='section-25'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-24'>#</a>
+        <a class='octothorpe' href='#section-25'>#</a>
       </div>
       
     </div>
@@ -404,6 +417,7 @@
     <span class="n">urls_to_handler</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">{</span><span class="s2">&quot;urls&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;https://twitter.com&quot;</span><span class="p">],</span> <span class="s2">&quot;handler&quot;</span><span class="p">:</span> <span class="n">Twitter</span><span class="p">},</span>
         <span class="p">{</span><span class="s2">&quot;urls&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;https://youtube.com&quot;</span><span class="p">,</span> <span class="s2">&quot;https://www.youtube.com&quot;</span><span class="p">,</span> <span class="s2">&quot;https://m.youtube.com&quot;</span><span class="p">],</span> <span class="s2">&quot;handler&quot;</span><span class="p">:</span> <span class="n">Youtube</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;urls&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;https://github.com&quot;</span><span class="p">,</span> <span class="s2">&quot;https://www.github.com&quot;</span><span class="p">],</span> <span class="s2">&quot;handler&quot;</span><span class="p">:</span> <span class="n">GitHub</span><span class="p">},</span>
     <span class="p">]</span>
 
     <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">urls_to_handler</span><span class="p">:</span>
@@ -416,10 +430,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-25'>
+  <div class='section' id='section-26'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-25'>#</a>
+        <a class='octothorpe' href='#section-26'>#</a>
       </div>
       
     </div>
@@ -443,10 +457,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-26'>
+  <div class='section' id='section-27'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-26'>#</a>
+        <a class='octothorpe' href='#section-27'>#</a>
       </div>
       
     </div>
@@ -459,10 +473,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-27'>
+  <div class='section' id='section-28'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-27'>#</a>
+        <a class='octothorpe' href='#section-28'>#</a>
       </div>
       
     </div>
@@ -474,10 +488,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-28'>
+  <div class='section' id='section-29'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-28'>#</a>
+        <a class='octothorpe' href='#section-29'>#</a>
       </div>
       
     </div>
@@ -491,10 +505,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-29'>
+  <div class='section' id='section-30'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-29'>#</a>
+        <a class='octothorpe' href='#section-30'>#</a>
       </div>
       <p>Start bot and hook callback functions</p>
     </div>
@@ -540,10 +554,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-30'>
+  <div class='section' id='section-31'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-30'>#</a>
+        <a class='octothorpe' href='#section-31'>#</a>
       </div>
       
     </div>
@@ -567,10 +581,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-31'>
+  <div class='section' id='section-32'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-31'>#</a>
+        <a class='octothorpe' href='#section-32'>#</a>
       </div>
       
     </div>
@@ -580,10 +594,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-32'>
+  <div class='section' id='section-33'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-32'>#</a>
+        <a class='octothorpe' href='#section-33'>#</a>
       </div>
       
     </div>

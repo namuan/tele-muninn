@@ -6,6 +6,8 @@ Collection of Telegram bots
 
 > Acrylic Paint of Muninn, Aerial View, in the style of Ancient Egyptian Art
 
+![](docs/flow.png)
+
 ###### Setting up python3 and dependencies with VirtualEnv
 
 ```
@@ -73,6 +75,22 @@ options:
   -v, --verbose  Increase verbosity of logging output
 
 ```
+[_muninn-git-repo-downloader.py_](https://namuan.github.io/tele-muninn/muninn-git-repo-downloader.html)
+```
+Running Muninn-GitRepo-Downloader
+usage: muninn-git-repo-downloader.py [-h] -d DATABASE_FILE_PATH [-b] [-v]
+
+Download web page using puppeteer and save it to local file system
+
+options:
+  -h, --help            show this help message and exit
+  -d DATABASE_FILE_PATH, --database-file-path DATABASE_FILE_PATH
+                        Path to database file
+  -b, --batch           Run in batch mode (no scheduling, just run once)
+  -v, --verbose         Increase verbosity of logging output. Display context
+                        variables between each step run
+
+```
 [_tele_web_links.py_](https://namuan.github.io/tele-muninn/tele_web_links.html)
 ```
 usage: tele_web_links.py [-h] [-v]
@@ -86,6 +104,7 @@ options:
 ```
 [_muninn-web-page-downloader.py_](https://namuan.github.io/tele-muninn/muninn-web-page-downloader.html)
 ```
+Running Muninn-WebPage-Downloader
 usage: muninn-web-page-downloader.py [-h] -d DATABASE_FILE_PATH [-b] [-v]
 
 Download web page using puppeteer and save it to local file system
@@ -113,28 +132,10 @@ options:
   -v, --verbose  Increase verbosity of logging output
 
 ```
-[_webpage_to_pdf.py_](https://namuan.github.io/tele-muninn/webpage_to_pdf.html)
-```
-usage: webpage_to_pdf.py [-h] -i INPUT_URL -o OUTPUT_FILE_PATH
-                         [-w WAIT_IN_SECS_BEFORE_CAPTURE] [-s] [-v]
-
-Generate PDF from a webpage
-
-options:
-  -h, --help            show this help message and exit
-  -i INPUT_URL, --input-url INPUT_URL
-                        Web Url
-  -o OUTPUT_FILE_PATH, --output-file-path OUTPUT_FILE_PATH
-                        Full output file path for PDF
-  -w WAIT_IN_SECS_BEFORE_CAPTURE, --wait-in-secs-before-capture WAIT_IN_SECS_BEFORE_CAPTURE
-                        Wait (in secs) before capturing screenshot
-  -s, --headless        Run headless (no browser window)
-  -v, --verbose         Increase verbosity of logging output
-
-```
 [_hn_new_github_repos.py_](https://namuan.github.io/tele-muninn/hn_new_github_repos.html)
 ```
-usage: hn_new_github_repos.py [-h] [-v]
+Running HN GitHub Repos
+usage: hn_new_github_repos.py [-h] [-b] [-v]
 
 Find Links to Github/GitLab and Bitbucket from HN new news
 Send links over Telegram
@@ -144,20 +145,9 @@ Usage:
 
 options:
   -h, --help     show this help message and exit
-  -v, --verbose  Display context variables at each step
-
-```
-[_bot_template.py_](https://namuan.github.io/tele-muninn/bot_template.html)
-```
-usage: bot_template.py [-h] [-v]
-
-Listen to messages with tt and ii prefix
-If a message begins with tt then it'll send a prompt to OpenAI Completion API
-If a message begins with ii then it'll send a prompt to OpenAI Image API
-
-options:
-  -h, --help     show this help message and exit
-  -v, --verbose  Increase verbosity of logging output
+  -b, --batch    Run in batch mode (no scheduling, just run once)
+  -v, --verbose  Increase verbosity of logging output. Display context
+                 variables between each step run
 
 ```
 [_twitter_furus.py_](https://namuan.github.io/tele-muninn/twitter_furus.html)
