@@ -109,6 +109,10 @@ class WebPage(BaseHandler):
         return None
 
 
+class GitHub(WebPage):
+    pass
+
+
 class PlainTextNote(BaseHandler):
     def _bookmark(self) -> str:
         return self.note
@@ -151,6 +155,7 @@ def message_handler_for(incoming_text) -> BaseHandler:
     urls_to_handler = [
         {"urls": ["https://twitter.com"], "handler": Twitter},
         {"urls": ["https://youtube.com", "https://www.youtube.com", "https://m.youtube.com"], "handler": Youtube},
+        {"urls": ["https://github.com", "https://www.github.com"], "handler": GitHub},
     ]
 
     for entry in urls_to_handler:
