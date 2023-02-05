@@ -3,6 +3,7 @@
 Copy local files to GDrive remote storage
 """
 import logging
+import mimetypes
 import os
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from pathlib import Path
@@ -16,7 +17,7 @@ from googleapiclient.http import MediaFileUpload
 from py_executable_checklist.workflow import WorkflowBase
 
 from common_utils import run_in_background, setup_logging, table_from
-from tele_bookmark_bot import WebPage
+from tele_bookmark_bot import GitHub, WebPage
 
 load_dotenv()
 
@@ -68,7 +69,9 @@ class SelectPendingBookmarksToUpload(WorkflowBase):
     def execute(self) -> dict:
         with table_from(self.database_file_path) as db_table:
             logging.info("Selecting next batch of files to upload from %s table", db_table.name)
-            web_pages = db_table.find(source=WebPage.__name__, content={"!=": "Not downloaded"}, remote_file_id=None)
+            web_pages = db_table.find(
+                source=(WebPage.__name__, GitHub.__name__), content={"!=": "Not downloaded"}, remote_file_id=None
+            )
             local_archived_files = {web_page["id"]: Path(web_page["content"]) for web_page in web_pages}
 
         return {"local_files": local_archived_files}
@@ -89,7 +92,7 @@ class UploadWebPagesToGDrive(WorkflowBase):
             logging.info("Uploading %s to GDrive", local_file)
             file_metadata = {"name": local_file.stem, "parents": [GDRIVE_REMOTE_FOLDER_ID]}
             try:
-                media = MediaFileUpload(local_file.as_posix(), mimetype="application/pdf")
+                media = MediaFileUpload(local_file.as_posix(), mimetype=mimetypes.guess_type(local_file.as_posix())[0])
                 file = self.google_service.files().create(body=file_metadata, media_body=media, fields="id").execute()
                 uploaded_file_id = file.get("id")
                 print(f"Updating database with local id {db_id} -> remote file id: {uploaded_file_id}")
