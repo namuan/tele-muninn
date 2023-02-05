@@ -107,7 +107,7 @@ def parse_args():
 
 
 if __name__ == "__main__":
-    logging.info("Running Muninn-WebPage-Downloader")
+    print("Running Muninn-WebPage-Downloader")
     args = parse_args()
     setup_logging(args.verbose)
     context = args.__dict__
