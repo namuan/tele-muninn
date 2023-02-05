@@ -35,6 +35,8 @@ def main(args):
         "img_2_txt.py",
         "readme_docs.py",
         "yt_api.py",
+        "webpage_to_pdf.py",
+        "bot_template.py",
     ]
     py_scripts_with_help = []
     # Grab all the python scripts in the current directory and collect output from running the help command
