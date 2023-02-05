@@ -80,7 +80,7 @@ options:
 Running Muninn-GitRepo-Downloader
 usage: muninn-git-repo-downloader.py [-h] -d DATABASE_FILE_PATH [-b] [-v]
 
-Download web page using puppeteer and save it to local file system
+Download the snapshot of GitHub repos as a zip file and save it to local file system
 
 options:
   -h, --help            show this help message and exit
