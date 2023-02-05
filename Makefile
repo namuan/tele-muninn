@@ -48,6 +48,7 @@ deploy: clean ## Copies any changed file to the server
 		muninn-photo-ocr.py \
 		muninn-storage.py \
 		muninn-web-page-downloader.py \
+		muninn-git-repo-downloader.py \
 		${PROJECTNAME}:./${PROJECTNAME}
 
 start: deploy ## Sets up a screen session on the server and start the app
