@@ -17,7 +17,7 @@ Collection of Telegram bots
 ### Scripts
 
 <!-- START makefile-doc -->
-[_muninn-photo-ocr.py_](https://namuan.github.io/tele-muninn/muninn-photo-ocr.html)
+muninn-photo-ocr.py
 ```
 Running Muninn-OCR
 usage: muninn-photo-ocr.py [-h] -d DATABASE_FILE_PATH [-b] [-v]
@@ -31,7 +31,7 @@ options:
                         variables between each step run
 
 ```
-[_tele-social-vdo.py_](https://namuan.github.io/tele-muninn/tele-social-vdo.html)
+tele-social-vdo.py
 ```
 usage: tele-social-vdo.py [-h] [-i INPUT_URL] [-b] [-v]
 
@@ -46,7 +46,7 @@ options:
                         variables between each step run
 
 ```
-[_muninn-storage.py_](https://namuan.github.io/tele-muninn/muninn-storage.html)
+muninn-storage.py
 ```
 Running Muninn-Storage
 usage: muninn-storage.py [-h] -d DATABASE_FILE_PATH -t TOKEN_FILE [-b] [-v]
@@ -64,7 +64,7 @@ options:
                         variables between each step run
 
 ```
-[_tele_bookmark_bot.py_](https://namuan.github.io/tele-muninn/tele_bookmark_bot.html)
+tele_bookmark_bot.py
 ```
 usage: tele_bookmark_bot.py [-h] [-v]
 
@@ -75,7 +75,7 @@ options:
   -v, --verbose  Increase verbosity of logging output
 
 ```
-[_muninn-git-repo-downloader.py_](https://namuan.github.io/tele-muninn/muninn-git-repo-downloader.html)
+muninn-git-repo-downloader.py
 ```
 Running Muninn-GitRepo-Downloader
 usage: muninn-git-repo-downloader.py [-h] -d DATABASE_FILE_PATH [-b] [-v]
@@ -91,7 +91,7 @@ options:
                         variables between each step run
 
 ```
-[_tele_web_links.py_](https://namuan.github.io/tele-muninn/tele_web_links.html)
+tele_web_links.py
 ```
 usage: tele_web_links.py [-h] [-v]
 
@@ -102,7 +102,7 @@ options:
   -v, --verbose  Increase verbosity of logging output
 
 ```
-[_muninn-web-page-downloader.py_](https://namuan.github.io/tele-muninn/muninn-web-page-downloader.html)
+muninn-web-page-downloader.py
 ```
 Running Muninn-WebPage-Downloader
 usage: muninn-web-page-downloader.py [-h] -d DATABASE_FILE_PATH [-b] [-v]
@@ -118,7 +118,7 @@ options:
                         variables between each step run
 
 ```
-[_tele_pathy.py_](https://namuan.github.io/tele-muninn/tele_pathy.html)
+tele_pathy.py
 ```
 usage: tele_pathy.py [-h] [-v]
 
@@ -132,7 +132,7 @@ options:
   -v, --verbose  Increase verbosity of logging output
 
 ```
-[_hn_new_github_repos.py_](https://namuan.github.io/tele-muninn/hn_new_github_repos.html)
+hn_new_github_repos.py
 ```
 Running HN GitHub Repos
 usage: hn_new_github_repos.py [-h] [-b] [-v]
@@ -150,7 +150,7 @@ options:
                  variables between each step run
 
 ```
-[_twitter_furus.py_](https://namuan.github.io/tele-muninn/twitter_furus.html)
+twitter_furus.py
 ```
 usage: twitter_furus.py [-h] [-v]
 
@@ -162,7 +162,7 @@ options:
   -v, --verbose  Increase verbosity of logging output
 
 ```
-[_tele_stock_rider_bot.py_](https://namuan.github.io/tele-muninn/tele_stock_rider_bot.html)
+tele_stock_rider_bot.py
 ```
 usage: tele_stock_rider_bot.py [-h] [-v]
 
@@ -174,7 +174,7 @@ options:
   -v, --verbose  Increase verbosity of logging output
 
 ```
-[_tele_openai_bot.py_](https://namuan.github.io/tele-muninn/tele_openai_bot.html)
+tele_openai_bot.py
 ```
 usage: tele_openai_bot.py [-h] [-v]
 

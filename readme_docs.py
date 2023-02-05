@@ -48,9 +48,7 @@ def main(args):
             [f"python3 {f.as_posix()} --help"], shell=True, capture_output=True
         )  # nosemgrep
         py_scripts_with_help.append(
-            "[_{}_](https://namuan.github.io/tele-muninn/{}.html){}```{}{}{}```".format(
-                f.name, f.stem, os.linesep, os.linesep, py_help_output.stdout.decode("utf-8"), os.linesep
-            )
+            "{}{}```{}{}{}```".format(f.name, os.linesep, os.linesep, py_help_output.stdout.decode("utf-8"), os.linesep)
         )
 
     logging.info("Loaded all files. Now replacing regex patterns")
