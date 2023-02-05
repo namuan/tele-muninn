@@ -21,8 +21,9 @@ from py_executable_checklist.workflow import WorkflowBase
 from common_utils import (
     fetch_html_page,
     html_parser_from,
+    run_in_background,
     send_message_to_telegram,
-    setup_logging, run_in_background,
+    setup_logging,
 )
 
 # Common functions across steps
