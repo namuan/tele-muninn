@@ -90,6 +90,15 @@ async def generate_pdf(page, output_file_path):
     )
 
 
+async def close_any_open_dialogs(page):
+    link = await page.querySelector("#cookieChoiceDismiss")
+    if link:
+        await link.click()
+    link = await page.click('button[data-testid="close-button"]')
+    if link:
+        await link.click()
+
+
 async def main():
     args = parse_args()
     setup_logging(args.verbose)
@@ -116,6 +125,7 @@ async def main():
     try:
         browser, page = await open_site(browser, website_url, output_dir.as_posix())
         time.sleep(wait_in_secs_before_capture)
+        await close_any_open_dialogs(page)
         await scroll_to_end(page)
         logging.info("🚒 Reached end of page. Trying to capture PDF")
         if run_headless:
