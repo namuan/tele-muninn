@@ -16,16 +16,12 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from py_executable_checklist.workflow import WorkflowBase
 
-from common_utils import run_in_background, setup_logging, table_from
+from common_utils import GDRIVE_SCOPES, run_in_background, setup_logging, table_from
 from tele_bookmark_bot import GitHub, WebPage
 
 load_dotenv()
 
 GDRIVE_REMOTE_FOLDER_ID = os.getenv("GDRIVE_REMOTE_FOLDER_ID")
-
-SCOPES = [
-    "https://www.googleapis.com/auth/drive",
-]
 
 logging.getLogger("googleapiclient.discovery_cache").setLevel(logging.ERROR)
 
@@ -39,7 +35,7 @@ class ReadTokenFromFile(WorkflowBase):
 
     def execute(self) -> dict:
         logging.info("Reading token from %s", self.token_file)
-        credentials = Credentials.from_authorized_user_file(self.token_file.as_posix(), SCOPES)
+        credentials = Credentials.from_authorized_user_file(self.token_file.as_posix(), GDRIVE_SCOPES)
         return {"credentials": credentials}
 
 

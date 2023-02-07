@@ -22,6 +22,10 @@ from bs4 import BeautifulSoup
 from py_executable_checklist.workflow import WorkflowBase, run_workflow
 from rich.logging import RichHandler
 
+GDRIVE_SCOPES = [
+    "https://www.googleapis.com/auth/drive",
+]
+
 
 def setup_logging(verbosity):
     logging_level = logging.WARNING

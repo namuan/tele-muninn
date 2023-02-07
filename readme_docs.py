@@ -37,6 +37,7 @@ def main(args):
         "yt_api.py",
         "webpage_to_pdf.py",
         "bot_template.py",
+        "google-token.py",
     ]
     py_scripts_with_help = []
     # Grab all the python scripts in the current directory and collect output from running the help command
