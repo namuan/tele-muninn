@@ -94,7 +94,7 @@ async def close_any_open_dialogs(page):
     link = await page.querySelector("#cookieChoiceDismiss")
     if link:
         await link.click()
-    link = await page.click('button[data-testid="close-button"]')
+    link = await page.querySelector('button[data-testid="close-button"]')
     if link:
         await link.click()
 
