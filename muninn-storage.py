@@ -17,7 +17,7 @@ from googleapiclient.http import MediaFileUpload
 from py_executable_checklist.workflow import WorkflowBase
 
 from common_utils import GDRIVE_SCOPES, run_in_background, setup_logging, table_from
-from tele_bookmark_bot import GitHub, WebPage
+from tele_bookmark_bot import Document, GitHub, WebPage
 
 load_dotenv()
 
@@ -66,7 +66,9 @@ class SelectPendingBookmarksToUpload(WorkflowBase):
         with table_from(self.database_file_path) as db_table:
             logging.info("Selecting next batch of files to upload from %s table", db_table.name)
             web_pages = db_table.find(
-                source=(WebPage.__name__, GitHub.__name__), content={"!=": "Not downloaded"}, remote_file_id=None
+                source=(WebPage.__name__, GitHub.__name__, Document.__name__),
+                content={"!=": "Not downloaded"},
+                remote_file_id=None,
             )
             local_archived_files = {web_page["id"]: Path(web_page["content"]) for web_page in web_pages}
 
