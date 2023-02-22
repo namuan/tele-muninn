@@ -97,6 +97,12 @@ async def close_any_open_dialogs(page):
     link = await page.querySelector('button[data-testid="close-button"]')
     if link:
         await link.click()
+    link = await page.querySelector("#cookie-banner-close")
+    if link:
+        await link.click()
+    link = await page.querySelector('div[text="Continue reading"]')
+    if link:
+        await link.click()
 
 
 async def main():
@@ -125,8 +131,8 @@ async def main():
     try:
         browser, page = await open_site(browser, website_url, output_dir.as_posix())
         time.sleep(wait_in_secs_before_capture)
-        await close_any_open_dialogs(page)
         await scroll_to_end(page)
+        await close_any_open_dialogs(page)
         logging.info("🚒 Reached end of page. Trying to capture PDF")
         if run_headless:
             try:
