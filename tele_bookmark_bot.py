@@ -56,8 +56,9 @@ def help_command(update: Update, _):
 
 
 def update_user(bot, chat_id, original_message_id, reply_message_id, incoming_text):
-    bot.delete_message(chat_id, original_message_id)
-    bot.delete_message(chat_id, reply_message_id)
+    if "Photo" not in incoming_text:
+        bot.delete_message(chat_id, original_message_id)
+        bot.delete_message(chat_id, reply_message_id)
     bot.send_message(chat_id, f"🔖 {incoming_text} bookmarked")
 
 
