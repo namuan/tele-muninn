@@ -187,6 +187,26 @@ options:
   -v, --verbose  Increase verbosity of logging output
 
 ```
+twitter-threads.py
+```
+usage: twitter-threads.py [-h] -i TWEET_URL -o OUTPUT_DIR [-v]
+
+Download all tweets given a Twitter thread and archive them in a single HTML file.
+The input is a URL to the first tweet in the thread.
+The output is a directory where everything downloaded is stored. The HTML file is named with the tweet user and tweet id.
+Eg:
+./twitter-threads.py -i https://twitter.com/elonmusk/status/1320000000000000000 -o output_dir
+
+options:
+  -h, --help            show this help message and exit
+  -i TWEET_URL, --tweet_url TWEET_URL
+                        URL to the first tweet in the thread
+  -o OUTPUT_DIR, --output-dir OUTPUT_DIR
+                        Output directory
+  -v, --verbose         Increase verbosity of logging output. Display context
+                        variables between each step run
+
+```
 <!-- END makefile-doc -->
 
 ### Development
