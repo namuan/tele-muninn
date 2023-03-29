@@ -10,3 +10,4 @@ isort
 pyupgrade
 # Experimental
 git+https://github.com/openai/whisper.git
+git+https://github.com/JustAnotherArchivist/snscrape.git

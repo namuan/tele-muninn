@@ -1,9 +1,11 @@
 import logging
 import os
 import time
+from typing import List
 
 import tweepy
 from dotenv import load_dotenv
+from tweepy.models import Status
 
 load_dotenv()
 
@@ -24,6 +26,22 @@ def get_twitter_user_timeline(user_acct):
 
 def get_tweet(tweet_id):
     return with_limit_handled(lambda: api.get_status(id=tweet_id))
+
+
+def get_tweets_by_id(tweet_ids) -> List[Status]:
+    """Retrieve tweets by their ID"""
+    tweets = []
+    try:
+        # Split tweet IDs into chunks of 100, since API.lookup_statuses() can retrieve up to 100 tweets at once
+        id_chunks = [tweet_ids[i : i + 100] for i in range(0, len(tweet_ids), 100)]
+
+        # Retrieve tweets for each ID chunk
+        for id_chunk in id_chunks:
+            tweets.extend(api.lookup_statuses(id=id_chunk, tweet_mode="extended"))
+    except tweepy.TweepyException as e:
+        print("Error fetching tweets: ", e)
+
+    return tweets
 
 
 def get_twitter_home_timeline():
