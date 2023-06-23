@@ -44,7 +44,7 @@ class GrabHackerNewsPage(WorkflowBase):
 
     def execute(self):
         try:
-            page_html = fetch_html_page("https://news.ycombinator.com/newest")
+            page_html = fetch_html_page("https://news.ycombinator.com")
         except Exception:
             logging.warning("Unable to fetch Hackernews page")
             return {"hn_newest_html": "<html></html>"}
