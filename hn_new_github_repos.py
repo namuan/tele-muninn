@@ -42,9 +42,12 @@ class GrabHackerNewsPage(WorkflowBase):
     Grab HackerNews new page
     """
 
+    hn_page_url: str
+
     def execute(self):
         try:
-            page_html = fetch_html_page("https://news.ycombinator.com")
+            logging.info(f"Fetching {self.hn_page_url}")
+            page_html = fetch_html_page(self.hn_page_url)
         except Exception:
             logging.warning("Unable to fetch Hackernews page")
             return {"hn_newest_html": "<html></html>"}
@@ -186,4 +189,7 @@ if __name__ == "__main__":
     args = parse_args()
     setup_logging(args.verbose)
     context = args.__dict__
-    run_in_background(context, workflow())
+    hn_pages = ["https://news.ycombinator.com/newest", "https://news.ycombinator.com"]
+    for page in hn_pages:
+        context["hn_page_url"] = page
+        run_in_background(context, workflow())
