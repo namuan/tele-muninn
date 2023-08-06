@@ -150,6 +150,26 @@ options:
                  variables between each step run
 
 ```
+tele_research_agent.py
+```
+usage: tele_research_agent.py [-h] [-v] -q QUESTION -f FILE
+
+A personal research assistant
+
+Usage:
+./tele_research_agent.py -h
+
+./tele_research_agent.py -q QUESTION -f MARKDOWN_FILE
+./tele_research_agent.py -q "What is the best way to learn programming?" -f output.md
+
+options:
+  -h, --help            show this help message and exit
+  -v, --verbose         Increase verbosity of logging output
+  -q QUESTION, --question QUESTION
+                        Question to be asked
+  -f FILE, --file FILE  Target markdown file path
+
+```
 twitter_furus.py
 ```
 usage: twitter_furus.py [-h] [-v]
