@@ -21,6 +21,7 @@ def send_link(website_url):
         return
 
     try:
+        print(f"Sending {website_url}")
         send_message_to_telegram(BOT_TOKEN, GROUP_CHAT_ID, website_url, disable_web_preview=False)
     except Exception as e:
         print(f"Error processing: {website_url} - {str(e)}")

@@ -54,8 +54,9 @@ def handle_cmd(update: Update, context: CallbackContext) -> None:
     if not verified_chat_id(chat_id):
         return
 
-    maybe_symbol: str = update.message.text
-    if maybe_symbol.startswith("$"):
+    message_text: str = update.message.text
+    if message_text.startswith("$"):
+        maybe_symbol, _ = message_text.split(" ")
         ticker = maybe_symbol[1:]
         generate_report(ticker, update, context)
 

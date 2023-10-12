@@ -37,8 +37,6 @@ deploy: clean ## Copies any changed file to the server
 		webpage_to_pdf.py \
 		tele_bookmark_bot.py \
 		hn_new_github_repos.py \
-		twitter_furus_accounts.txt \
-		twitter_furus.py \
 		tele_stock_rider_bot.py \
 		webpages.txt \
 		tele_web_links.py \
