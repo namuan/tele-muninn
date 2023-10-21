@@ -56,8 +56,7 @@ def handle_cmd(update: Update, context: CallbackContext) -> None:
 
     message_text: str = update.message.text
     if message_text.startswith("$"):
-        maybe_symbol, _ = message_text.split(" ")
-        ticker = maybe_symbol[1:]
+        ticker = message_text[1:]
         generate_report(ticker, update, context)
 
 

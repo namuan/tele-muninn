@@ -20,7 +20,6 @@ import requests
 import schedule
 from bs4 import BeautifulSoup
 from py_executable_checklist.workflow import WorkflowBase, run_workflow
-from rich.logging import RichHandler
 
 GDRIVE_SCOPES = [
     "https://www.googleapis.com/auth/drive",
@@ -36,7 +35,7 @@ def setup_logging(verbosity):
 
     logging.basicConfig(
         handlers=[
-            RichHandler(),
+            logging.StreamHandler(),
         ],
         format="%(asctime)s - %(filename)s:%(lineno)d - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
