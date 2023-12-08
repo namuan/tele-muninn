@@ -118,6 +118,18 @@ options:
                         variables between each step run
 
 ```
+twitter-fetch.py
+```
+usage: twitter-fetch.py [-h] -i INPUT
+
+Download video from tweet url
+
+options:
+  -h, --help            show this help message and exit
+  -i INPUT, --input INPUT
+                        Twitter Url
+
+```
 tele_pathy.py
 ```
 usage: tele_pathy.py [-h] [-v]
