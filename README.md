@@ -206,19 +206,6 @@ options:
   -v, --verbose  Increase verbosity of logging output
 
 ```
-tele_openai_bot.py
-```
-usage: tele_openai_bot.py [-h] [-v]
-
-Listen to messages with tt and ii prefix
-If a message begins with tt then it'll send a prompt to OpenAI Completion API
-If a message begins with ii then it'll send a prompt to OpenAI Image API
-
-options:
-  -h, --help     show this help message and exit
-  -v, --verbose  Increase verbosity of logging output
-
-```
 twitter-threads.py
 ```
 usage: twitter-threads.py [-h] -i TWEET_URL -o OUTPUT_DIR [-v]
