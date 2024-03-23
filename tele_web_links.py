@@ -16,21 +16,11 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 GROUP_CHAT_ID = os.getenv("GROUP_CHAT_ID")
 
 
-def send_link(website_url):
-    if website_url.startswith("#"):
-        return
-
-    try:
-        print(f"Sending {website_url}")
-        send_message_to_telegram(BOT_TOKEN, GROUP_CHAT_ID, website_url, disable_web_preview=False)
-    except Exception as e:
-        print(f"Error processing: {website_url} - {str(e)}")
-
-
 def main():
     webpages = Path("webpages.txt").read_text().splitlines()
-    for webpage in webpages:
-        send_link(webpage)
+    formatted_message = "Links<br/>" + "  ".join([w for w in webpages if not w.startswith("#")]) + "<br/>"
+    send_message_to_telegram(BOT_TOKEN, GROUP_CHAT_ID, formatted_message, format="HTML")
+    print(f"Sent {formatted_message}")
 
 
 def run():
