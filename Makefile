@@ -41,7 +41,7 @@ deploy: clean ## Copies any changed file to the server
 		webpages.txt \
 		tele_web_links.py \
 		openai_api.py \
-		tele-social-vdo.py \
+		tele_social_vdo.py \
 		muninn-photo-ocr.py \
 		muninn-storage.py \
 		muninn-web-page-downloader.py \

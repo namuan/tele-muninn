@@ -31,21 +31,6 @@ options:
                         variables between each step run
 
 ```
-tele-social-vdo.py
-```
-usage: tele-social-vdo.py [-h] [-i INPUT_URL] [-b] [-v]
-
-Telegram bot to download videos from social media websites
-
-options:
-  -h, --help            show this help message and exit
-  -i INPUT_URL, --input-url INPUT_URL
-                        Input url
-  -b, --run-as-bot      Run as telegram bot
-  -v, --verbose         Increase verbosity of logging output. Display context
-                        variables between each step run
-
-```
 muninn-storage.py
 ```
 Running Muninn-Storage
@@ -142,6 +127,21 @@ Then send the audio back to Telegram
 options:
   -h, --help     show this help message and exit
   -v, --verbose  Increase verbosity of logging output
+
+```
+tele_social_vdo.py
+```
+usage: tele_social_vdo.py [-h] [-i INPUT_URL] [-b] [-v]
+
+Telegram bot to download videos from social media websites
+
+options:
+  -h, --help            show this help message and exit
+  -i INPUT_URL, --input-url INPUT_URL
+                        Input url
+  -b, --run-as-bot      Run as telegram bot
+  -v, --verbose         Increase verbosity of logging output. Display context
+                        variables between each step run
 
 ```
 hn_new_github_repos.py
