@@ -17,6 +17,19 @@ Collection of Telegram bots
 ### Scripts
 
 <!-- START makefile-doc -->
+tele_py_code_runner.py
+```
+usage: tele_py_code_runner.py [-h] [-b] [-v]
+
+Telegram bot to run Python code
+
+options:
+  -h, --help        show this help message and exit
+  -b, --run-as-bot  Run as telegram bot
+  -v, --verbose     Increase verbosity of logging output. Display context
+                    variables between each step run
+
+```
 muninn-photo-ocr.py
 ```
 Running Muninn-OCR
