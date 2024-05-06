@@ -2,13 +2,29 @@
 """
 Telegram bot to run Python code
 """
+import logging
 import os
 import re
 import subprocess
 import tempfile
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
-from common_utils import setup_logging
+import telegram
+from dotenv import load_dotenv
+from telegram import Update
+from telegram.ext import (
+    CallbackContext,
+    CommandHandler,
+    Filters,
+    MessageHandler,
+    Updater,
+)
+
+from common_utils import retry, setup_logging, verified_chat_id
+
+load_dotenv()
+
+BOT_TOKEN = os.getenv("Q6Q6HJ632R_BOT_TOKEN")
 
 
 class CodeExecutor:
@@ -23,22 +39,31 @@ class CodeExecutor:
             subprocess.run(["pip", "install", package], check=True)
 
     def execute_code(self):
-        output = []
-        # Write code to a temporary file
         with tempfile.NamedTemporaryFile(delete=False, suffix=".py", mode="w") as tmp_file:
-            tmp_file.write(self.code)
+            custom_print_code = """
+import sys
+
+def custom_print(*args, sep=' ', end='\\n', file=None):
+    output = sep.join(map(str, args)) + end
+    sys.stdout.write(output)
+    sys.stdout.flush()
+
+# Assign the custom print function to the built-in print
+print = custom_print
+"""
+            tmp_file.write(custom_print_code + self.code)
             tmp_file_path = tmp_file.name
 
+        python_cmd = ["python3", tmp_file_path]
+        print(f"🤖 Running command: {python_cmd}")
         with subprocess.Popen(
-            ["python", tmp_file_path],
+            python_cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            bufsize=1,  # Set to line buffered
-            text=True,  # Handles output as text, easier for line reading
+            text=True,
         ) as proc:
             try:
-                for line in iter(proc.stdout.readline, ""):
-                    output.append(line)
+                yield from iter(proc.stdout.readline, "")
             except Exception as e:
                 print(e)
             finally:
@@ -46,7 +71,6 @@ class CodeExecutor:
 
         # Clean up the temporary file
         os.remove(tmp_file_path)
-        return "".join(output)
 
     def run(self):
         self.parse_and_install_packages()
@@ -67,8 +91,50 @@ def parse_args():
     return parser.parse_args()
 
 
+def start(update: Update, _) -> None:
+    update.message.reply_text("👋 Enter code snippet to run")
+
+
+def help_command(update: Update, _) -> None:
+    update.message.reply_text("Help!")
+
+
+@retry(telegram.error.TimedOut, tries=3)
+def handle_cmd(update: Update, context: CallbackContext) -> None:
+    print(f"Incoming update: {update}")
+    chat_id = update.effective_chat.id
+    if not verified_chat_id(chat_id):
+        return
+
+    message_text: str = update.message.text
+    executor = CodeExecutor(message_text)
+    bot = context.bot
+    cid = update.effective_chat.id
+    update.message.reply_text("⚡ Running code", quote=True)
+
+    try:
+        for output in executor.run():
+            print(output, end="")
+            bot.send_message(cid, output, disable_web_page_preview=True)
+    except NameError as e:
+        bot.send_message(cid, str(e))
+
+
 def main():
-    pass
+    """Start the bot."""
+    logging.info("Starting bot")
+    updater = Updater(BOT_TOKEN, use_context=True)
+
+    dispatcher = updater.dispatcher
+
+    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(CommandHandler("help", help_command))
+
+    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_cmd))
+
+    updater.start_polling()
+
+    updater.idle()
 
 
 if __name__ == "__main__":
@@ -80,11 +146,12 @@ if __name__ == "__main__":
         test_code = """
 # pip install requests
 import time
+print("Starting...")
 for i in range(3):
     print(f"Sleeping {i+1}")
     time.sleep(1)
 print("Finished sleeping.")
     """
         executor = CodeExecutor(test_code)
-        output = executor.run()
-        print(output)
+        for output in executor.run():
+            print(output, end="")
