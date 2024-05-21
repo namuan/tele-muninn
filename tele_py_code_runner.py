@@ -36,7 +36,7 @@ class CodeExecutor:
         pip_commands = re.findall(r"#\s*pip\s*install\s*([a-zA-Z0-9\-_]+)", self.code)
         for package in pip_commands:
             print(f"Installing package: {package}")
-            subprocess.run(["pip", "install", package], check=True)
+            subprocess.run(["python3", "-m", "pip", "install", package], check=True)
 
     def execute_code(self):
         with tempfile.NamedTemporaryFile(delete=False, suffix=".py", mode="w") as tmp_file:
@@ -54,12 +54,12 @@ print = custom_print
             tmp_file.write(custom_print_code + self.code)
             tmp_file_path = tmp_file.name
 
-        python_cmd = ["python3", tmp_file_path]
+        python_cmd = ["python3", tmp_file_path, "2>&1"]
         print(f"🤖 Running command: {python_cmd}")
         with subprocess.Popen(
             python_cmd,
             stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
+            stderr=subprocess.PIPE,
             text=True,
         ) as proc:
             try:
