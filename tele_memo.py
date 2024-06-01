@@ -5,6 +5,7 @@ Spaced Repetition using Telegram Bot
 import argparse
 import logging
 import os
+import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from random import choice
@@ -52,9 +53,13 @@ def get_random_question_from_xml():
     question = card.find(".//text[@name='Front']").text
     answer = card.find(".//text[@name='Back']").text
 
-    # Remove unusual new lines and strip leading/trailing whitespace
-    question = question.replace("\n", " ").strip()
-    answer = answer.replace("\n", " ").strip()
+    # Remove unusual new lines
+    question = question.replace("\n", " ")
+    answer = answer.replace("\n", " ")
+
+    # Remove unusual new lines and excessive spaces
+    question = re.sub(r"\s+", " ", question)
+    answer = re.sub(r"\s+", " ", answer)
 
     return {"question": question.strip(), "answer": answer.strip()}
 
@@ -88,14 +93,13 @@ def button_handler(update: Update, context: CallbackContext) -> None:
             update.message.reply_text("No question to flip. Please ask a question first.")
     elif user_input in ["🔴 Hard", "🟡 Fair", "🟢 Easy"]:
         logger.info(f"Button pressed: {user_input}")
-        update.message.reply_text(f"You rated the question as: {user_input}")
         # Reset the user data after rating
         if user_id in user_data:
             del user_data[user_id]
         # Show the "Ask Next Question" button again
         reply_keyboard = [["Ask Next Question"]]
         markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
-        update.message.reply_text("Press the button to ask the next question.", reply_markup=markup)
+        update.message.reply_text(f"You rated the question as: {user_input}", reply_markup=markup)
 
 
 def main(args) -> None:

@@ -47,6 +47,8 @@ deploy: clean ## Copies any changed file to the server
 		muninn-storage.py \
 		muninn-web-page-downloader.py \
 		muninn-git-repo-downloader.py \
+		qa-database.xml \
+		tele_memo.py \
 		${PROJECTNAME}:./${PROJECTNAME}
 
 start: deploy ## Sets up a screen session on the server and start the app
