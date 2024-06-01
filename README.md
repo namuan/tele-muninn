@@ -157,6 +157,19 @@ options:
                         variables between each step run
 
 ```
+tele_memo.py
+```
+usage: tele_memo.py [-h] [-v] -i DATABASE
+
+Spaced Repetition using Telegram Bot
+
+options:
+  -h, --help            show this help message and exit
+  -v, --verbose         Increase verbosity of logging output
+  -i DATABASE, --database DATABASE
+                        QA Database
+
+```
 hn_new_github_repos.py
 ```
 Running HN GitHub Repos
