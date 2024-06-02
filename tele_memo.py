@@ -7,9 +7,11 @@ import logging
 import os
 import re
 import xml.etree.ElementTree as ET
+from datetime import datetime
 from pathlib import Path
 from random import choice
 
+import dataset
 import telegram
 from dotenv import load_dotenv
 from telegram import ReplyKeyboardMarkup, Update
@@ -31,6 +33,16 @@ logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 BOT_TOKEN = os.getenv("A6QI320OG5_BOT_TOKEN")
+
+HOME_DIR = os.getenv("HOME")
+DB_FILE = "tele_memo.db"
+DB_CONNECTION_STRING = f"sqlite:///{HOME_DIR}/{DB_FILE}"
+QA_SESSIONS_TABLE = "qa_sessions"
+
+db = dataset.connect(DB_CONNECTION_STRING)
+logger.info(f"Connecting to database {DB_CONNECTION_STRING}")
+logger.info(f"Creating table {QA_SESSIONS_TABLE}")
+qa_sessions_table = db.create_table(QA_SESSIONS_TABLE)
 
 
 # Define the command handler for the /start command
@@ -64,6 +76,24 @@ def get_random_question_from_xml():
     return {"question": question.strip(), "answer": answer.strip()}
 
 
+def store_qa_result(user_id, question, answer, user_response):
+    global qa_sessions_table
+    # Create a dictionary for the entry
+    entry_row = {
+        "user_id": user_id,
+        "question": question,
+        "answer": answer,
+        "user_response": user_response,
+        "created_at": datetime.now(),
+    }
+
+    # Insert the entry into the table
+    qa_sessions_table.insert(entry_row)
+
+    # Log the action
+    logger.info(f"Stored QA result: {entry_row}")
+
+
 # Dictionary to store the current question for each user
 user_data = {}
 
@@ -81,9 +111,12 @@ def button_handler(update: Update, context: CallbackContext) -> None:
         display_answer(update, user_id)
     elif user_input in ["🔴 Hard", "🟡 Fair", "🟢 Easy"]:
         logger.info(f"Button pressed: {user_input}")
-        # Reset the user data after rating
         if user_id in user_data:
+            qa_pair = user_data[user_id]
+            store_qa_result(user_id, qa_pair["question"], qa_pair["answer"], user_input)
+            # Reset the user data after rating
             del user_data[user_id]
+
         ask_next_question(update, user_id)
 
 
