@@ -7,7 +7,7 @@ import logging
 import os
 import re
 import xml.etree.ElementTree as ET
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import dataset
@@ -51,12 +51,69 @@ def start(update: Update, context: CallbackContext) -> None:
     update.message.reply_text("Press the button to ask the next question.", reply_markup=markup)
 
 
-def get_random_question_from_database():
-    result = next(db.query("SELECT question, answer FROM qa_sessions ORDER BY RANDOM() LIMIT 1;"))
-    return {"question": result["question"], "answer": result["answer"]}
+def fetch_unasked_question():
+    result = next(
+        db.query(
+            """
+        SELECT question, answer
+        FROM qa_sessions
+        WHERE user_response IS NULL
+        ORDER BY RANDOM()
+        LIMIT 1
+    """
+        ),
+        None,
+    )
+    return (result["question"], result["answer"]) if result else (None, None)
 
 
-def store_qa_result(user_id, question, answer, user_response):
+def fetch_question_for_review():
+    today = date.today()
+    result = next(
+        db.query(
+            """
+        SELECT question, answer
+        FROM qa_sessions
+        WHERE next_review <= ?
+        ORDER BY RANDOM()
+        LIMIT 1
+    """,
+            (today,),
+        ),
+        None,
+    )
+    return (result["question"], result["answer"]) if result else (None, None)
+
+
+def get_question_answer():
+    # Step 2: Fetch Unasked Questions
+    question, answer = fetch_unasked_question()
+
+    # Step 3: Check if there are unasked questions
+    if question:
+        return {"question": question, "answer": answer}
+    else:
+        # Step 7: Fetch Questions for Regular Review
+        question, answer = fetch_question_for_review()
+        if question:
+            return {"question": question, "answer": answer}
+        else:
+            return None  # No questions available for review
+
+
+def calculate_next_review(user_response):
+    today = date.today()
+    if user_response == "🟢 Easy":
+        return today + timedelta(days=4)
+    elif user_response == "🟡 Fair":
+        return today + timedelta(days=2)
+    elif user_response == "🔴 Hard":
+        return today + timedelta(days=1)
+    else:
+        raise ValueError("Invalid feedback value")
+
+
+def store_qa_result(user_id, question, user_response):
     global qa_sessions_table
     # Create a dictionary for the entry
     entry_row = {
@@ -64,6 +121,7 @@ def store_qa_result(user_id, question, answer, user_response):
         "question": question,
         "user_response": user_response,
         "updated_at": datetime.now(),
+        "next_review": calculate_next_review(user_response),
     }
 
     qa_sessions_table.update(entry_row, ["question"])
@@ -91,7 +149,7 @@ def button_handler(update: Update, context: CallbackContext) -> None:
         logger.info(f"Button pressed: {user_input}")
         if user_id in user_data:
             qa_pair = user_data[user_id]
-            store_qa_result(user_id, qa_pair["question"], qa_pair["answer"], user_input)
+            store_qa_result(user_id, qa_pair["question"], user_input)
             # Reset the user data after rating
             del user_data[user_id]
 
@@ -110,7 +168,7 @@ def display_answer(update, user_id):
 
 
 def ask_next_question(update, user_id):
-    qa_pair = get_random_question_from_database()
+    qa_pair = get_question_answer()
     user_data[user_id] = qa_pair
     logger.info("Button pressed: Ask Next Question")
     reply_keyboard = [["Flip"]]
@@ -176,6 +234,7 @@ def import_from_source(source: Path):
             "question": question.strip(),
             "answer": answer.strip(),
             "created_at": datetime.now(),
+            "user_response": None,
         }
         # Insert the entry into the table
         qa_sessions_table.insert(entry_row)
