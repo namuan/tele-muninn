@@ -9,7 +9,6 @@ import re
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from pathlib import Path
-from random import choice
 
 import dataset
 import telegram
@@ -52,28 +51,9 @@ def start(update: Update, context: CallbackContext) -> None:
     update.message.reply_text("Press the button to ask the next question.", reply_markup=markup)
 
 
-qa_data_filepath: str = None
-
-
-def get_random_question_from_xml():
-    assert qa_data_filepath is not None
-
-    tree = ET.parse(qa_data_filepath)
-    root = tree.getroot()
-    cards = root.findall(".//card")
-    card = choice(cards)
-    question = card.find(".//text[@name='Front']").text
-    answer = card.find(".//text[@name='Back']").text
-
-    # Remove unusual new lines
-    question = question.replace("\n", " ")
-    answer = answer.replace("\n", " ")
-
-    # Remove unusual new lines and excessive spaces
-    question = re.sub(r"\s+", " ", question)
-    answer = re.sub(r"\s+", " ", answer)
-
-    return {"question": question.strip(), "answer": answer.strip()}
+def get_random_question_from_database():
+    result = next(db.query("SELECT question, answer FROM qa_sessions ORDER BY RANDOM() LIMIT 1;"))
+    return {"question": result["question"], "answer": result["answer"]}
 
 
 def store_qa_result(user_id, question, answer, user_response):
@@ -82,13 +62,11 @@ def store_qa_result(user_id, question, answer, user_response):
     entry_row = {
         "user_id": user_id,
         "question": question,
-        "answer": answer,
         "user_response": user_response,
-        "created_at": datetime.now(),
+        "updated_at": datetime.now(),
     }
 
-    # Insert the entry into the table
-    qa_sessions_table.insert(entry_row)
+    qa_sessions_table.update(entry_row, ["question"])
 
     # Log the action
     logger.info(f"Stored QA result: {entry_row}")
@@ -132,7 +110,7 @@ def display_answer(update, user_id):
 
 
 def ask_next_question(update, user_id):
-    qa_pair = get_random_question_from_xml()
+    qa_pair = get_random_question_from_database()
     user_data[user_id] = qa_pair
     logger.info("Button pressed: Ask Next Question")
     reply_keyboard = [["Flip"]]
@@ -141,8 +119,6 @@ def ask_next_question(update, user_id):
 
 
 def main(args) -> None:
-    global qa_data_filepath
-    qa_data_filepath = args.database
     updater = Updater(BOT_TOKEN)
 
     # Get the dispatcher to register handlers
@@ -169,11 +145,46 @@ def parse_args():
         dest="verbose",
         help="Increase verbosity of logging output",
     )
-    parser.add_argument("-i", "--database", type=Path, required=True, help="QA Database")
+    parser.add_argument(
+        "-i",
+        "--import-anki",
+        action="store_true",
+        default=False,
+        help="Import Question Answers from Anki Exported XML file",
+    )
+    parser.add_argument("-s", "--source", type=Path, help="QA Database")
     return parser.parse_args()
+
+
+def import_from_source(source: Path):
+    tree = ET.parse(source)
+    root = tree.getroot()
+    cards = root.findall(".//card")
+    for card in cards:
+        question = card.find(".//text[@name='Front']").text
+        answer = card.find(".//text[@name='Back']").text
+        # Remove unusual new lines
+        question = question.replace("\n", " ")
+        answer = answer.replace("\n", " ")
+
+        # Remove unusual new lines and excessive spaces
+        question = re.sub(r"\s+", " ", question)
+        answer = re.sub(r"\s+", " ", answer)
+
+        # Create a dictionary for the entry
+        entry_row = {
+            "question": question.strip(),
+            "answer": answer.strip(),
+            "created_at": datetime.now(),
+        }
+        # Insert the entry into the table
+        qa_sessions_table.insert(entry_row)
 
 
 if __name__ == "__main__":
     args = parse_args()
     setup_logging(args.verbose)
-    main(args)
+    if args.import_anki:
+        import_from_source(args.source)
+    else:
+        main(args)

@@ -159,14 +159,15 @@ options:
 ```
 tele_memo.py
 ```
-usage: tele_memo.py [-h] [-v] -i DATABASE
+usage: tele_memo.py [-h] [-v] [-i] [-s SOURCE]
 
 Spaced Repetition using Telegram Bot
 
 options:
   -h, --help            show this help message and exit
   -v, --verbose         Increase verbosity of logging output
-  -i DATABASE, --database DATABASE
+  -i, --import-anki     Import Question Answers from Anki Exported XML file
+  -s SOURCE, --source SOURCE
                         QA Database
 
 ```
