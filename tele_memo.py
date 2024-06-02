@@ -76,30 +76,35 @@ def button_handler(update: Update, context: CallbackContext) -> None:
         return
 
     if user_input == "Ask Next Question":
-        qa_pair = get_random_question_from_xml()
-        user_data[user_id] = qa_pair
-        logger.info("Button pressed: Ask Next Question")
-        reply_keyboard = [["Flip"]]
-        markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
-        update.message.reply_text(f'Question:\n{qa_pair["question"]}', reply_markup=markup)
+        ask_next_question(update, user_id)
     elif user_input == "Flip":
-        if user_id in user_data:
-            answer = user_data[user_id]["answer"]
-            logger.info("Button pressed: Flip")
-            reply_keyboard = [["🔴 Hard", "🟡 Fair", "🟢 Easy"]]
-            markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
-            update.message.reply_text(f"{answer}", reply_markup=markup)
-        else:
-            update.message.reply_text("No question to flip. Please ask a question first.")
+        display_answer(update, user_id)
     elif user_input in ["🔴 Hard", "🟡 Fair", "🟢 Easy"]:
         logger.info(f"Button pressed: {user_input}")
         # Reset the user data after rating
         if user_id in user_data:
             del user_data[user_id]
-        # Show the "Ask Next Question" button again
-        reply_keyboard = [["Ask Next Question"]]
+        ask_next_question(update, user_id)
+
+
+def display_answer(update, user_id):
+    if user_id in user_data:
+        answer = user_data[user_id]["answer"]
+        logger.info("Button pressed: Flip")
+        reply_keyboard = [["🔴 Hard", "🟡 Fair", "🟢 Easy"]]
         markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
-        update.message.reply_text(f"You rated the question as: {user_input}", reply_markup=markup)
+        update.message.reply_text(f"{answer}", reply_markup=markup)
+    else:
+        ask_next_question(update, user_id)
+
+
+def ask_next_question(update, user_id):
+    qa_pair = get_random_question_from_xml()
+    user_data[user_id] = qa_pair
+    logger.info("Button pressed: Ask Next Question")
+    reply_keyboard = [["Flip"]]
+    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+    update.message.reply_text(f'<b>Question</b>\n{qa_pair["question"]}', parse_mode="HTML", reply_markup=markup)
 
 
 def main(args) -> None:
