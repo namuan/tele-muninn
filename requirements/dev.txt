@@ -11,3 +11,6 @@ pyupgrade
 # Experimental
 git+https://github.com/openai/whisper.git
 git+https://github.com/JustAnotherArchivist/snscrape.git
+# Not available on RaspberryPi
+httpx==0.27.0
+twikit

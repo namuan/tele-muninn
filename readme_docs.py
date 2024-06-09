@@ -31,6 +31,7 @@ def main(args):
         "voice_to_openai.py",
         "common_utils.py",
         "twitter_api.py",
+        "twit_api.py",
         "openai_api.py",
         "img_2_txt.py",
         "readme_docs.py",

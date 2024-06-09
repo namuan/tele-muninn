@@ -24,7 +24,7 @@ from common_utils import (
     send_message_to_telegram,
     uuid_gen,
 )
-from twitter_api import get_twitter_user_timeline
+from twit_api import get_twitter_user_timeline
 
 home_dir = os.getenv("HOME")
 db = SqliteDatabase(home_dir + "/twitter_pumps.db")
@@ -107,16 +107,18 @@ def collect_symbols_from_tweets(twitter_accounts):
                 tweet_id = extract_tweet_id(recent_tweet)
                 raw_posted_dt = extract_tweet_time(recent_tweet)
                 if tweet_already_processed(tweet_id):
-                    print(f"Old Tweet from {acct} at {raw_posted_dt} -> {tweet_id} - already processed")
+                    print(
+                        f"Old Tweet from {recent_tweet.user.name} at {raw_posted_dt} -> {tweet_id} - already processed"
+                    )
                     continue
                 else:
-                    print(f"New Tweet from {acct} at {raw_posted_dt} -> {tweet_id}")
+                    print(f"New Tweet from {recent_tweet.user.name} at {raw_posted_dt} -> {tweet_id}")
 
                 tweet, symbols_from_message = extract_symbols(recent_tweet)
                 if not tweet.startswith("RT") and symbols_from_message:
                     for symbol in flatten_list(symbols_from_message):
                         entity = dict(
-                            twitter_handle=acct,
+                            twitter_handle=recent_tweet.user.name,
                             symbol=symbol,
                             tweet=tweet,
                             tweet_id=tweet_id,
@@ -125,7 +127,7 @@ def collect_symbols_from_tweets(twitter_accounts):
                         symbols.append(entity)
                         save_data(entity)
         except Exception as e:
-            print(f"An error collecting symbols from twitter account {acct}")
+            print(f"An error collecting symbols from twitter account {recent_tweet.user.name}")
             print(e)
 
         time.sleep(poll_freq_in_secs)
