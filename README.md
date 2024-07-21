@@ -233,6 +233,32 @@ options:
   -v, --verbose  Increase verbosity of logging output
 
 ```
+tele_github_context_builder.py
+```
+usage: tele_github_context_builder.py [-h] [-b] [-u URL]
+                                      [-t TYPES [TYPES ...]] [-v]
+
+Telegram bot to generate LLM context from GitHub repositories
+This script downloads a GitHub repository, extracts it, and builds a context
+from specified folder and file types.
+
+Usage:
+Run as a telegram bot
+./tele_github_context_builder.py -v -v
+
+Single use
+./tele_github_context_builder.py -u https://github.com/motion-canvas/motion-canvas/tree/main/packages/docs/docs -t md mdx -v
+
+options:
+  -h, --help            show this help message and exit
+  -b, --run-as-bot      Run as telegram bot
+  -u URL, --url URL     GitHub URL (repository or specific folder)
+  -t TYPES [TYPES ...], --types TYPES [TYPES ...]
+                        File types to include (e.g., .py .js)
+  -v, --verbose         Increase verbosity of logging output. Display context
+                        variables between each step run
+
+```
 twitter-threads.py
 ```
 usage: twitter-threads.py [-h] -i TWEET_URL -o OUTPUT_DIR [-v]

@@ -39,6 +39,7 @@ deploy: clean ## Copies any changed file to the server
 		hn_new_github_repos.py \
 		tele_stock_rider_bot.py \
 		tele_py_code_runner.py \
+		tele_github_context_builder.py \
 		webpages.txt \
 		tele_web_links.py \
 		openai_api.py \
