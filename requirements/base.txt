@@ -7,7 +7,7 @@ feedparser
 python-telegram-bot==13.15
 finviz
 exif
-dataset
+dataset==1.6.2
 tweepy
 praw
 pytube
