@@ -128,10 +128,17 @@ def rewrite_with_ai(title, text, api_key, model):
         time.sleep(wait)
 
     prompt = f"""
-Rewrite the following Wikipedia content into a short, engaging, neutral fact.
-Keep it under 80 words.
+Rewrite the following Wikipedia content into a short, engaging, neutral fact (max 80 words).
+Then, extract 3-5 interesting 'Did you know' facts as a bulleted list.
 No emojis.
 No hashtags.
+
+Format:
+SUMMARY: [The summary text]
+FACTS:
+- [Fact 1]
+- [Fact 2]
+...
 
 Title: {title}
 
@@ -156,7 +163,22 @@ Content:
             )
             r.raise_for_status()
             AI_LAST_CALL = time.time()
-            return r.json()["choices"][0]["message"]["content"].strip()
+            content = r.json()["choices"][0]["message"]["content"].strip()
+
+            # Parse response
+
+            if "SUMMARY:" in content and "FACTS:" in content:
+                parts = content.split("FACTS:")
+                summary_part = parts[0].replace("SUMMARY:", "").strip()
+                facts_part = parts[1].strip()
+                return summary_part, facts_part
+            elif "FACTS:" in content:
+                # Fallback if Summary label missing but FACTS present
+                parts = content.split("FACTS:")
+                return parts[0].strip(), parts[1].strip()
+
+            return content, ""
+
         except Exception as e:
             logging.warning(f"AI rewrite failed ({attempt + 1}): {e}")
             time.sleep(2)
@@ -179,6 +201,13 @@ def init_db(conn):
     )
     """
     )
+
+    # Migration: Add facts column if missing
+    try:
+        cur.execute("ALTER TABLE articles ADD COLUMN facts TEXT")
+    except sqlite3.OperationalError:
+        pass  # Column likely exists
+
     cur.execute(
         """
     CREATE TABLE IF NOT EXISTS seen (
@@ -203,7 +232,7 @@ def get_article(conn, user_id, api_key, model):
     # 1. Try cached unseen article first
     cur.execute(
         """
-        SELECT a.title, a.rewritten, a.url, a.image
+        SELECT a.title, a.rewritten, a.url, a.image, a.facts
         FROM articles a
         LEFT JOIN seen s
         ON a.title = s.title AND s.user_id = ?
@@ -215,26 +244,26 @@ def get_article(conn, user_id, api_key, model):
 
     row = cur.fetchone()
     if row:
-        title, rewritten, url, image = row
+        title, rewritten, url, image, facts = row
         cur.execute("INSERT INTO seen VALUES (?, ?)", (user_id, title))
         conn.commit()
-        return title, rewritten, url, image
+        return title, rewritten, url, image, facts
 
     # 2. Fallback: fetch live (same as before)
     for _ in range(5):
         wiki = fetch_wikipedia()
         title = wiki["title"]
 
-        rewritten = rewrite_with_ai(title, wiki["extract"], api_key, model)
+        rewritten, facts = rewrite_with_ai(title, wiki["extract"], api_key, model)
         cur.execute(
-            "INSERT OR IGNORE INTO articles VALUES (?, ?, ?, ?)",
-            (title, rewritten, wiki["url"], wiki["image"]),
+            "INSERT OR IGNORE INTO articles (title, rewritten, url, image, facts) VALUES (?, ?, ?, ?, ?)",
+            (title, rewritten, wiki["url"], wiki["image"], facts),
         )
         conn.commit()
 
         cur.execute("INSERT OR IGNORE INTO seen VALUES (?, ?)", (user_id, title))
         conn.commit()
-        return title, rewritten, wiki["url"], wiki["image"]
+        return title, rewritten, wiki["url"], wiki["image"], facts
 
     raise RuntimeError("Failed to get article")
 
@@ -263,7 +292,7 @@ def preload_worker(conn, api_key, model):
             if cur.fetchone():
                 continue
 
-            rewritten = rewrite_with_ai(
+            rewritten, facts = rewrite_with_ai(
                 wiki["title"],
                 wiki["extract"],
                 api_key,
@@ -271,12 +300,13 @@ def preload_worker(conn, api_key, model):
             )
 
             cur.execute(
-                "INSERT OR IGNORE INTO articles VALUES (?, ?, ?, ?)",
+                "INSERT OR IGNORE INTO articles (title, rewritten, url, image, facts) VALUES (?, ?, ?, ?, ?)",
                 (
                     wiki["title"],
                     rewritten,
                     wiki["url"],
                     wiki["image"],
+                    facts,
                 ),
             )
             conn.commit()
@@ -291,8 +321,12 @@ def preload_worker(conn, api_key, model):
 # -------------------------
 # UI helpers
 # -------------------------
-def caption(title, rewritten):
-    return f"*{title}*\n\n" f"{rewritten}\n\n" f"_Source: Wikipedia (CC BY-SA)_"
+def caption(title, rewritten, facts=None):
+    text = f"*{title}*\n\n{rewritten}"
+    if facts:
+        text += f"\n\n*Did you know?*\n{facts}"
+    text += "\n\n_Source: Wikipedia (CC BY-SA)_"
+    return text
 
 
 def keyboard(url):
@@ -315,18 +349,20 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     model = context.bot_data["openrouter_model"]
 
     # Run blocking DB/Network call in a thread
-    title, rewritten, url, image = await asyncio.to_thread(get_article, conn, update.effective_user.id, api_key, model)
+    title, rewritten, url, image, facts = await asyncio.to_thread(
+        get_article, conn, update.effective_user.id, api_key, model
+    )
 
     if image:
         await update.message.reply_photo(
             photo=image,
-            caption=caption(title, rewritten),
+            caption=caption(title, rewritten, facts),
             reply_markup=keyboard(url),
             parse_mode="Markdown",
         )
     else:
         await update.message.reply_text(
-            caption(title, rewritten),
+            caption(title, rewritten, facts),
             reply_markup=keyboard(url),
             parse_mode="Markdown",
         )
@@ -341,20 +377,20 @@ async def next_article(update: Update, context: ContextTypes.DEFAULT_TYPE):
     model = context.bot_data["openrouter_model"]
 
     # Run blocking DB/Network call in a thread
-    title, rewritten, url, image = await asyncio.to_thread(get_article, conn, q.from_user.id, api_key, model)
+    title, rewritten, url, image, facts = await asyncio.to_thread(get_article, conn, q.from_user.id, api_key, model)
 
     if image:
         await context.bot.send_photo(
             chat_id=update.effective_chat.id,
             photo=image,
-            caption=caption(title, rewritten),
+            caption=caption(title, rewritten, facts),
             parse_mode="Markdown",
             reply_markup=keyboard(url),
         )
     else:
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text=caption(title, rewritten),
+            text=caption(title, rewritten, facts),
             parse_mode="Markdown",
             reply_markup=keyboard(url),
         )
