@@ -1,4 +1,11 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --quiet --script
+# /// script
+# dependencies = [
+#   "python-telegram-bot>=20.0",
+#   "requests",
+#   "python-dotenv",
+# ]
+# ///
 """
 Wikipedia TikTok-style Telegram bot (simple)
 
@@ -7,6 +14,7 @@ Usage:
 """
 
 import argparse
+import asyncio
 import logging
 import os
 import sqlite3
@@ -23,10 +31,10 @@ from telegram import (
     Update,
 )
 from telegram.ext import (
-    CallbackContext,
+    Application,
     CallbackQueryHandler,
     CommandHandler,
-    Updater,
+    ContextTypes,
 )
 
 
@@ -302,37 +310,39 @@ def keyboard(url):
 # -------------------------
 # Telegram handlers
 # -------------------------
-def start(update: Update, context: CallbackContext):
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     conn = context.bot_data["db"]
     api_key = context.bot_data["openrouter_key"]
     model = context.bot_data["openrouter_model"]
 
-    title, rewritten, url, image = get_article(conn, update.effective_user.id, api_key, model)
+    # Run blocking DB/Network call in a thread
+    title, rewritten, url, image = await asyncio.to_thread(get_article, conn, update.effective_user.id, api_key, model)
 
     if image:
-        update.message.reply_photo(
+        await update.message.reply_photo(
             photo=image,
             caption=caption(title, rewritten),
             reply_markup=keyboard(url),
             parse_mode="Markdown",
         )
     else:
-        update.message.reply_text(
+        await update.message.reply_text(
             caption(title, rewritten),
             reply_markup=keyboard(url),
             parse_mode="Markdown",
         )
 
 
-def next_article(update: Update, context: CallbackContext):
+async def next_article(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
-    q.answer()
+    await q.answer()
 
     conn = context.bot_data["db"]
     api_key = context.bot_data["openrouter_key"]
     model = context.bot_data["openrouter_model"]
 
-    title, rewritten, url, image = get_article(conn, q.from_user.id, api_key, model)
+    # Run blocking DB/Network call in a thread
+    title, rewritten, url, image = await asyncio.to_thread(get_article, conn, q.from_user.id, api_key, model)
 
     if image:
         media = InputMediaPhoto(
@@ -340,12 +350,12 @@ def next_article(update: Update, context: CallbackContext):
             caption=caption(title, rewritten),
             parse_mode="Markdown",
         )
-        q.edit_message_media(
+        await q.edit_message_media(
             media=media,
             reply_markup=keyboard(url),
         )
     else:
-        q.edit_message_text(
+        await q.edit_message_text(
             caption(title, rewritten),
             reply_markup=keyboard(url),
             parse_mode="Markdown",
@@ -370,15 +380,15 @@ def main(args):
     conn = sqlite3.connect(str(args.database_file_path), check_same_thread=False)
     init_db(conn)
 
-    updater = Updater(token=bot_token, use_context=True)
-    dispatcher = updater.dispatcher
+    # Build Application (v20+)
+    application = Application.builder().token(bot_token).build()
 
-    dispatcher.bot_data["db"] = conn
-    dispatcher.bot_data["openrouter_key"] = openrouter_key
-    dispatcher.bot_data["openrouter_model"] = openrouter_model
+    application.bot_data["db"] = conn
+    application.bot_data["openrouter_key"] = openrouter_key
+    application.bot_data["openrouter_model"] = openrouter_model
 
-    dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(CallbackQueryHandler(next_article))
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CallbackQueryHandler(next_article))
 
     preloader = threading.Thread(
         target=preload_worker,
@@ -388,8 +398,7 @@ def main(args):
     preloader.start()
 
     logging.info("Bot running...")
-    updater.start_polling()
-    updater.idle()
+    application.run_polling()
 
 
 if __name__ == "__main__":
