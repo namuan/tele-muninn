@@ -27,7 +27,6 @@ from dotenv import load_dotenv
 from telegram import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
-    InputMediaPhoto,
     Update,
 )
 from telegram.ext import (
@@ -345,20 +344,19 @@ async def next_article(update: Update, context: ContextTypes.DEFAULT_TYPE):
     title, rewritten, url, image = await asyncio.to_thread(get_article, conn, q.from_user.id, api_key, model)
 
     if image:
-        media = InputMediaPhoto(
-            media=image,
+        await context.bot.send_photo(
+            chat_id=update.effective_chat.id,
+            photo=image,
             caption=caption(title, rewritten),
             parse_mode="Markdown",
-        )
-        await q.edit_message_media(
-            media=media,
             reply_markup=keyboard(url),
         )
     else:
-        await q.edit_message_text(
-            caption(title, rewritten),
-            reply_markup=keyboard(url),
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=caption(title, rewritten),
             parse_mode="Markdown",
+            reply_markup=keyboard(url),
         )
 
 
