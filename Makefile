@@ -48,6 +48,7 @@ deploy: clean ## Copies any changed file to the server
 		muninn-storage.py \
 		muninn-web-page-downloader.py \
 		muninn-git-repo-downloader.py \
+		tele-wiki-tok-bot.py \
 		tele_memo.py \
 		${PROJECTNAME}:./${PROJECTNAME}
 

@@ -64,14 +64,15 @@ options:
 ```
 tele-wiki-tok-bot.py
 ```
-usage: tele-wiki-tok-bot.py [-h] [--db DB] [-v]
+usage: tele-wiki-tok-bot.py [-h] [-d DATABASE_FILE_PATH] [-v]
 
 Wikipedia TikTok-style Telegram bot
 
 options:
-  -h, --help     show this help message and exit
-  --db DB        Path to SQLite database file
-  -v, --verbose  Increase verbosity (-v, -vv)
+  -h, --help                          show this help message and exit
+  -d, --database-file-path DATABASE_FILE_PATH
+                                      Path to SQLite database file
+  -v, --verbose                       Increase verbosity (-v, -vv)
 
 ```
 tele_bookmark_bot.py

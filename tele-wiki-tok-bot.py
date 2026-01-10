@@ -3,7 +3,7 @@
 Wikipedia TikTok-style Telegram bot (simple)
 
 Usage:
-./wiki_tok_bot.py --db bot.db -v
+./wiki_tok_bot.py --database-file-path bot.db -v
 """
 
 import argparse
@@ -12,6 +12,7 @@ import os
 import sqlite3
 import threading
 import time
+from pathlib import Path
 
 import requests
 from dotenv import load_dotenv
@@ -48,8 +49,10 @@ def setup_logging(verbosity: int):
 def parse_args():
     parser = argparse.ArgumentParser(description="Wikipedia TikTok-style Telegram bot")
     parser.add_argument(
-        "--db",
-        default="bot.db",
+        "-d",
+        "--database-file-path",
+        type=Path,
+        default=Path("bot.db"),
         help="Path to SQLite database file",
     )
     parser.add_argument(
@@ -362,9 +365,9 @@ def main(args):
     if not bot_token or not openrouter_key:
         raise RuntimeError("BOT_TOKEN or OPENROUTER_API_KEY missing")
 
-    logging.info(f"Using database: {args.db}")
+    logging.info(f"Using database: {args.database_file_path}")
 
-    conn = sqlite3.connect(args.db, check_same_thread=False)
+    conn = sqlite3.connect(str(args.database_file_path), check_same_thread=False)
     init_db(conn)
 
     updater = Updater(token=bot_token, use_context=True)
