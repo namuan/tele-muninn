@@ -3,23 +3,21 @@ export PROJECTNAME=$(shell basename "$(PWD)")
 .SILENT: ;               # no need for @
 
 setup: ## Setup Virtual Env
-	python3.10 -m venv venv
-	venv/bin/pip3 install -r requirements/dev.txt
+	uv sync
 
 deps: ## Install dependencies
-	venv/bin/pip3 install --upgrade -r requirements/dev.txt
-	venv/bin/python3 -m pip install --upgrade pip
+	uv sync --all-extras
 
 clean: ## Clean package
 	find . -type d -name '__pycache__' | xargs rm -rf
 	rm -rf build dist
 
 pre-commit: ## Manually run all precommit hooks
-	./venv/bin/pre-commit install
-	./venv/bin/pre-commit run --all-files
+	uv run pre-commit install
+	uv run pre-commit run --all-files
 
 pre-commit-tool: ## Manually run a single pre-commit hook
-	./venv/bin/pre-commit run $(TOOL) --all-files
+	uv run pre-commit run $(TOOL) --all-files
 
 build: clean pre-commit ## Build package
 	echo "✅ Done"
@@ -69,7 +67,7 @@ syncdatabases: ## Copy databases from remote to local
 	rsync -avzr ${PROJECTNAME}:./OutputDir/tele-bookmarks/* output_dir/tele-bookmarks/
 
 bpython: ## Runs bpython
-	venv/bin/bpython
+	uv run bpython
 
 .PHONY: help
 .DEFAULT_GOAL := help

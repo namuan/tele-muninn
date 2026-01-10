@@ -114,7 +114,6 @@ def calculate_next_review(user_response):
 
 
 def store_qa_result(user_id, question, user_response):
-    global qa_sessions_table
     # Create a dictionary for the entry
     entry_row = {
         "user_id": user_id,
