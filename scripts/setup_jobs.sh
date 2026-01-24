@@ -3,7 +3,7 @@ uv sync --no-dev
 #bash ./scripts/start_screen.sh tele-bookmark-bot 'uv run --no-project tele_bookmark_bot.py'
 bash ./scripts/start_screen.sh hn-new-github-repos 'uv run --no-project hn_new_github_repos.py -v'
 #bash ./scripts/start_screen.sh tele-furus 'uv run --no-project twitter_furus.py'
-#bash ./scripts/start_screen.sh tele-stock-rider-bot 'uv run --no-project tele_stock_rider_bot.py'
+bash ./scripts/start_screen.sh tele-stock-rider-bot 'uv run --no-project tele_stock_rider_bot.py'
 bash ./scripts/start_screen.sh tele-wiki-tok-bot 'uv run --no-project tele-wiki-tok-bot.py --database-file-path ~/tele_wiki_tok_bot.db -v'
 #bash ./scripts/start_screen.sh tele-py-code-runner 'uv run tele_py_code_runner.py -b -v'
 #bash ./scripts/start_screen.sh tele-web-links 'uv run --no-project tele_web_links.py'
