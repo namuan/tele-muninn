@@ -1,4 +1,4 @@
-cd tele-muninn || exit
+cd $1 || exit
 uv sync --no-dev
 bash ./scripts/start_screen.sh tele-bookmark-bot 'uv run --no-project tele_bookmark_bot.py'
 bash ./scripts/start_screen.sh hn-new-github-repos 'uv run --no-project hn_new_github_repos.py -v'

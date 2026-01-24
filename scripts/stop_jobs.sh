@@ -1,4 +1,4 @@
-cd tele-muninn || exit
+cd $1|| exit
 bash ./scripts/stop_screen.sh tele-bookmark-bot
 bash ./scripts/stop_screen.sh hn-new-github-repos
 #bash ./scripts/stop_screen.sh tele-furus
